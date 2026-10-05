@@ -1,6 +1,9 @@
 /**
  * IA AFRICA CORE — Model Engine
- * Moteur central d'exécution et de secours des modèles IA.
+ * Moteur central d'exécution des modèles IA.
+ *
+ * Flux :
+ * Registry → Health → Selector → Priority → Fallback → Exécution
  */
 
 import {
@@ -9,6 +12,18 @@ import {
 } from "./model-registry";
 
 import { selectModel } from "./model-selector";
+
+import {
+  getFallbackModels,
+} from "./model-fallback";
+
+import {
+  getHealthyModels,
+} from "./model-health";
+
+import {
+  rankModels,
+} from "./model-priority";
 
 export interface ModelMessage {
   role: "system" | "user" | "assistant";
@@ -38,48 +53,88 @@ export interface ModelRunner {
 }
 
 /**
- * Exécute le modèle choisi par IA AFRICA CORE.
+ * Exécute le meilleur modèle disponible.
  *
- * Si le modèle principal échoue, CORE essaie
- * automatiquement un autre modèle disponible.
+ * IA AFRICA CORE :
+ * 1. Vérifie les modèles disponibles.
+ * 2. Vérifie leur état.
+ * 3. Sélectionne le modèle adapté.
+ * 4. Classe les modèles par priorité.
+ * 5. Utilise automatiquement un modèle de secours
+ *    si le modèle principal échoue.
  */
 export async function runModel(
   runner: ModelRunner,
   request: ModelRequest,
 ): Promise<ModelExecutionResult> {
-  const models = getAvailableModels();
 
-  if (models.length === 0) {
+  const availableModels = getAvailableModels();
+
+  if (availableModels.length === 0) {
     throw new Error("Aucun modèle IA disponible.");
+  }
+
+  const healthyModels = getHealthyModels();
+
+  if (healthyModels.length === 0) {
+    throw new Error("Aucun modèle IA opérationnel.");
   }
 
   const selected = selectModel(request.domain);
 
+  const rankedModels = rankModels(request.domain);
+
+  const fallbackModels = getFallbackModels(selected.id);
+
   const orderedModels: ModelDefinition[] = [
     selected,
-    ...models
-      .filter((model) => model.id !== selected.id)
-      .sort((a, b) => b.priority - a.priority),
+
+    ...rankedModels.filter(
+      (model) =>
+        model.id !== selected.id &&
+        model.enabled,
+    ),
+
+    ...fallbackModels.filter(
+      (model) =>
+        model.id !== selected.id &&
+        model.enabled,
+    ),
   ];
+
+  const uniqueModels = orderedModels.filter(
+    (model, index, array) =>
+      array.findIndex(
+        (item) => item.id === model.id,
+      ) === index,
+  );
 
   const errors: string[] = [];
 
-  for (const model of orderedModels) {
+  for (const model of uniqueModels) {
     try {
-      const response = await runner.run(model.name, {
-        messages: request.messages,
-        stream: request.stream ?? false,
-      });
+
+      const response = await runner.run(
+        model.name,
+        {
+          messages: request.messages,
+          stream: request.stream ?? false,
+        },
+      );
 
       return {
         model: model.name,
         provider: model.provider,
         response,
       };
+
     } catch (error) {
+
       errors.push(
         `${model.name}: ${
-          error instanceof Error ? error.message : String(error)
+          error instanceof Error
+            ? error.message
+            : String(error)
         }`,
       );
     }
