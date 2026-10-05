@@ -21,6 +21,7 @@ import {
  * Comprendre
  * → Classer
  * → Choisir le service
+ * → Appliquer le comportement du service
  * → Choisir le modèle
  * → Exécuter
  * → Préparer la réponse
@@ -56,7 +57,12 @@ export async function runAfricaCore(
   const domain = service.id;
 
   /*
-   * 2. Préparer le contexte du service
+   * 2. Récupérer le comportement spécialisé du service
+   */
+  const servicePrompt = selection.prompt;
+
+  /*
+   * 3. Préparer le contexte du service
    */
   const messages: ModelMessage[] = [
     {
@@ -66,6 +72,9 @@ export async function runAfricaCore(
         "Comprends la demande de l'utilisateur avant de répondre. " +
         `Le service sélectionné est : ${service.name}. ` +
         `Description du service : ${service.description}. ` +
+        "Applique les instructions spécialisées suivantes :\n\n" +
+        servicePrompt +
+        "\n\n" +
         "Réponds de manière claire, utile et adaptée au contexte africain. " +
         "Ne prétends pas avoir effectué une action que tu n'as pas effectuée.",
     },
@@ -76,7 +85,7 @@ export async function runAfricaCore(
   ];
 
   /*
-   * 3. Choisir et exécuter le modèle
+   * 4. Choisir et exécuter le modèle
    */
   const result = await runModel(runner, {
     messages,
@@ -85,12 +94,12 @@ export async function runAfricaCore(
   });
 
   /*
-   * 4. Extraire la réponse
+   * 5. Extraire la réponse
    */
   const answer = extractAnswer(result.response);
 
   /*
-   * 5. Retourner le résultat du CORE
+   * 6. Retourner le résultat du CORE
    */
   return {
     answer,
@@ -159,4 +168,5 @@ function calculateConfidence(
   }
 
   return 0.7;
+}
             
