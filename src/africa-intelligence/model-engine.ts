@@ -1,6 +1,6 @@
 /**
  * IA AFRICA CORE — Model Engine
- * Moteur central d'exécution des modèles IA.
+ * Moteur central d'exécution et de secours des modèles IA.
  */
 
 import {
@@ -38,7 +38,10 @@ export interface ModelRunner {
 }
 
 /**
- * Exécute le modèle sélectionné par IA AFRICA CORE.
+ * Exécute le modèle choisi par IA AFRICA CORE.
+ *
+ * Si le modèle principal échoue, CORE essaie
+ * automatiquement un autre modèle disponible.
  */
 export async function runModel(
   runner: ModelRunner,
@@ -50,24 +53,39 @@ export async function runModel(
     throw new Error("Aucun modèle IA disponible.");
   }
 
-  const selected: ModelDefinition = selectModel(request.domain);
+  const selected = selectModel(request.domain);
 
-  try {
-    const response = await runner.run(selected.name, {
-      messages: request.messages,
-      stream: request.stream ?? false,
-    });
+  const orderedModels: ModelDefinition[] = [
+    selected,
+    ...models
+      .filter((model) => model.id !== selected.id)
+      .sort((a, b) => b.priority - a.priority),
+  ];
 
-    return {
-      model: selected.name,
-      provider: selected.provider,
-      response,
-    };
-  } catch (error) {
-    throw new Error(
-      `Échec de l'exécution du modèle ${selected.name}: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
+  const errors: string[] = [];
+
+  for (const model of orderedModels) {
+    try {
+      const response = await runner.run(model.name, {
+        messages: request.messages,
+        stream: request.stream ?? false,
+      });
+
+      return {
+        model: model.name,
+        provider: model.provider,
+        response,
+      };
+    } catch (error) {
+      errors.push(
+        `${model.name}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
   }
-  }
+
+  throw new Error(
+    `Tous les modèles IA ont échoué. ${errors.join(" | ")}`,
+  );
+}
