@@ -9,14 +9,20 @@ import {
   type ModelMessage,
 } from "./model-engine";
 
+import {
+  selectService,
+} from "./service-selector";
+
 /**
  * IA AFRICA CORE — Intelligence Pipeline
  *
- * Flux :
+ * Flux central :
+ *
  * Comprendre
  * → Classer
+ * → Choisir le service
  * → Choisir le modèle
- * → Exécuter le modèle
+ * → Exécuter
  * → Préparer la réponse
  */
 
@@ -24,6 +30,7 @@ export async function runAfricaCore(
   request: IntelligenceRequest,
   runner: ModelRunner,
 ): Promise<IntelligenceResult> {
+
   const content = String(request.content ?? "").trim();
 
   if (!content) {
@@ -35,19 +42,32 @@ export async function runAfricaCore(
       metadata: {
         inputType: request.type,
         language: request.language ?? "auto",
+        service: "general",
       },
     };
   }
 
-  const domain = detectDomain(content);
+  /*
+   * 1. Comprendre et classer la demande
+   */
+  const selection = selectService(content);
 
+  const service = selection.service;
+  const domain = service.id;
+
+  /*
+   * 2. Préparer le contexte du service
+   */
   const messages: ModelMessage[] = [
     {
       role: "system",
       content:
         "Tu es le moteur d'intelligence de IA AFRICA CORE. " +
-        "Comprends la demande, réponds clairement et de manière utile. " +
-        "Adapte ta réponse au domaine détecté.",
+        "Comprends la demande de l'utilisateur avant de répondre. " +
+        `Le service sélectionné est : ${service.name}. ` +
+        `Description du service : ${service.description}. ` +
+        "Réponds de manière claire, utile et adaptée au contexte africain. " +
+        "Ne prétends pas avoir effectué une action que tu n'as pas effectuée.",
     },
     {
       role: "user",
@@ -55,29 +75,48 @@ export async function runAfricaCore(
     },
   ];
 
+  /*
+   * 3. Choisir et exécuter le modèle
+   */
   const result = await runModel(runner, {
     messages,
     domain,
     stream: false,
   });
 
+  /*
+   * 4. Extraire la réponse
+   */
   const answer = extractAnswer(result.response);
 
+  /*
+   * 5. Retourner le résultat du CORE
+   */
   return {
     answer,
     domain,
-    confidence: domain === "general" ? 0.7 : 0.9,
+    confidence: calculateConfidence(
+      selection.score,
+      domain,
+    ),
     verified: false,
     metadata: {
       inputType: request.type,
       language: request.language ?? "auto",
+      service: service.id,
+      serviceName: service.name,
+      matchedKeywords: selection.matchedKeywords,
       model: result.model,
       provider: result.provider,
     },
   };
 }
 
+/**
+ * Extrait proprement le texte retourné par le modèle.
+ */
 function extractAnswer(response: unknown): string {
+
   if (typeof response === "string") {
     return response;
   }
@@ -94,68 +133,30 @@ function extractAnswer(response: unknown): string {
   return String(response ?? "");
 }
 
-function detectDomain(text: string): string {
-  const value = text.toLowerCase();
+/**
+ * Calcule une confiance simple à partir
+ * de la qualité du classement du service.
+ */
+function calculateConfidence(
+  score: number,
+  domain: string,
+): number {
 
-  if (
-    value.includes("école") ||
-    value.includes("élève") ||
-    value.includes("enseign") ||
-    value.includes("pédagog") ||
-    value.includes("cours") ||
-    value.includes("formation")
-  ) {
-    return "education";
+  if (domain === "general") {
+    return 0.7;
   }
 
-  if (
-    value.includes("agriculture") ||
-    value.includes("culture") ||
-    value.includes("élevage") ||
-    value.includes("ferme") ||
-    value.includes("récolte")
-  ) {
-    return "agriculture";
+  if (score >= 3) {
+    return 0.95;
   }
 
-  if (
-    value.includes("entreprise") ||
-    value.includes("business") ||
-    value.includes("commerce") ||
-    value.includes("vente") ||
-    value.includes("marché")
-  ) {
-    return "business";
+  if (score === 2) {
+    return 0.9;
   }
 
-  if (
-    value.includes("emploi") ||
-    value.includes("travail") ||
-    value.includes("cv") ||
-    value.includes("recrutement")
-  ) {
-    return "employment";
+  if (score === 1) {
+    return 0.8;
   }
 
-  if (
-    value.includes("traduire") ||
-    value.includes("traduction") ||
-    value.includes("anglais") ||
-    value.includes("français") ||
-    value.includes("zarma") ||
-    value.includes("haoussa")
-  ) {
-    return "languages";
-  }
-
-  if (
-    value.includes("pdf") ||
-    value.includes("document") ||
-    value.includes("lettre") ||
-    value.includes("rapport")
-  ) {
-    return "documents";
-  }
-
-  return "general";
-}
+  return 0.7;
+            }
