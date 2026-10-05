@@ -1,40 +1,33 @@
-/**
- * IA AFRICA CORE — Public API
- *
- * Point d'entrée du moteur central d'intelligence.
- */
-
 export {
-  runAfricaCore,
-} from "./intelligence-pipeline";
+  searchWeb,
+} from "./search-engine";
 
 export type {
-  IntelligenceRequest,
-  IntelligenceResult,
-  AfricaCore,
-} from "./core";
+  SearchRequest,
+  SearchResult,
+  SearchProvider,
+} from "./search-engine";
 
 export {
-  selectService,
-  getServiceId,
-  getSelectedServicePrompt,
-} from "./service-selector";
+  rankSources,
+} from "./source-ranking";
 
 export type {
-  ServiceSelection,
-} from "./service-selector";
+  RankedSource,
+} from "./source-ranking";
 
 export {
-  getServicePrompt,
-} from "./service-prompts";
-
-export {
-  runModel,
-} from "./model-engine";
+  orchestrateSearch,
+} from "./search-orchestrator";
 
 export type {
-  ModelRunner,
-  ModelRequest,
-  ModelMessage,
-  ModelExecutionResult,
-} from "./model-engine";
+  SearchOrchestrationResult,
+} from "./search-orchestrator";
+
+export {
+  buildSearchContext,
+} from "./search-context";
+
+export type {
+  SearchContext,
+} from "./search-context";
