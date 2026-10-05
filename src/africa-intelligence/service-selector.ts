@@ -1,7 +1,8 @@
 /**
  * IA AFRICA CORE — Service Selector
+ *
  * Détermine automatiquement le service adapté
- * à la demande de l'utilisateur.
+ * et récupère son comportement spécialisé.
  */
 
 import {
@@ -9,10 +10,15 @@ import {
   type ServiceDefinition,
 } from "./service-registry";
 
+import {
+  getServicePrompt,
+} from "./service-prompts";
+
 export interface ServiceSelection {
   service: ServiceDefinition;
   score: number;
   matchedKeywords: string[];
+  prompt: string;
 }
 
 export function selectService(
@@ -62,9 +68,14 @@ export function selectService(
     service: bestService,
     score: bestScore,
     matchedKeywords: bestKeywords,
+    prompt: getServicePrompt(bestService.id),
   };
 }
 
 export function getServiceId(text: string): string {
   return selectService(text).service.id;
+}
+
+export function getSelectedServicePrompt(text: string): string {
+  return selectService(text).prompt;
 }
