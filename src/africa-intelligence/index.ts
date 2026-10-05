@@ -40,4 +40,10 @@ export type {
 
 export {
   createExaSearchProvider,
-} from "./search-provider-factory";
+} from "./search-provider-factory";export {
+  createCloudflareModelRunner,
+} from "./cloudflare-model-runner";
+
+export type {
+  CloudflareAI,
+} from "./cloudflare-model-runner";
