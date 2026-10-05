@@ -159,4 +159,4 @@ function calculateConfidence(
   }
 
   return 0.7;
-            }
+            
