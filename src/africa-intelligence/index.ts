@@ -30,4 +30,14 @@ export {
 
 export type {
   SearchContext,
-} from "./search-context";
+} from "./search-context";export {
+  ExaSearchProvider,
+} from "./exa-search-provider";
+
+export type {
+  ExaSearchProviderOptions,
+} from "./exa-search-provider";
+
+export {
+  createExaSearchProvider,
+} from "./search-provider-factory";
