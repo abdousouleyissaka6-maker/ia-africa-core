@@ -1,0 +1,21 @@
+{
+  "name": "@ia-africa/core",
+  "version": "0.1.0",
+  "description": "IA AFRICA CORE - moteur central d'intelligence de la plateforme IA AFRICA",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
