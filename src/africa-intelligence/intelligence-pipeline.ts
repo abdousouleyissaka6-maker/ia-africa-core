@@ -3,28 +3,95 @@ import type {
   IntelligenceResult,
 } from "./core";
 
+import {
+  runModel,
+  type ModelRunner,
+  type ModelMessage,
+} from "./model-engine";
+
 /**
- * Premier pipeline exécutable de IA AFRICA CORE.
+ * IA AFRICA CORE — Intelligence Pipeline
  *
  * Flux :
- * Comprendre → Classer → Préparer
+ * Comprendre
+ * → Classer
+ * → Choisir le modèle
+ * → Exécuter le modèle
+ * → Préparer la réponse
  */
+
 export async function runAfricaCore(
   request: IntelligenceRequest,
+  runner: ModelRunner,
 ): Promise<IntelligenceResult> {
   const content = String(request.content ?? "").trim();
+
+  if (!content) {
+    return {
+      answer: "Je n'ai reçu aucune question.",
+      domain: "general",
+      confidence: 0,
+      verified: false,
+      metadata: {
+        inputType: request.type,
+        language: request.language ?? "auto",
+      },
+    };
+  }
+
   const domain = detectDomain(content);
 
-  return {
-    answer: "",
+  const messages: ModelMessage[] = [
+    {
+      role: "system",
+      content:
+        "Tu es le moteur d'intelligence de IA AFRICA CORE. " +
+        "Comprends la demande, réponds clairement et de manière utile. " +
+        "Adapte ta réponse au domaine détecté.",
+    },
+    {
+      role: "user",
+      content,
+    },
+  ];
+
+  const result = await runModel(runner, {
+    messages,
     domain,
-    confidence: domain === "general" ? 0.5 : 0.8,
+    stream: false,
+  });
+
+  const answer = extractAnswer(result.response);
+
+  return {
+    answer,
+    domain,
+    confidence: domain === "general" ? 0.7 : 0.9,
     verified: false,
     metadata: {
       inputType: request.type,
       language: request.language ?? "auto",
+      model: result.model,
+      provider: result.provider,
     },
   };
+}
+
+function extractAnswer(response: unknown): string {
+  if (typeof response === "string") {
+    return response;
+  }
+
+  if (
+    response &&
+    typeof response === "object" &&
+    "response" in response &&
+    typeof (response as { response?: unknown }).response === "string"
+  ) {
+    return (response as { response: string }).response;
+  }
+
+  return String(response ?? "");
 }
 
 function detectDomain(text: string): string {
