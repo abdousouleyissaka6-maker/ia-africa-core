@@ -140,5 +140,5 @@ export function getServiceById(
 ): ServiceDefinition | undefined {
   return SERVICE_REGISTRY.find(
     (service) => service.id === id && service.enabled,
-  );
-    }
+    );
+}
