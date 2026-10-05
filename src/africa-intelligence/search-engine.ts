@@ -2,7 +2,7 @@
  * IA AFRICA CORE — Search Engine
  *
  * Couche de recherche externe.
- * Le moteur peut recevoir un fournisseur de recherche
+ * Le moteur peut utiliser différents fournisseurs
  * sans dépendre directement d'un fournisseur particulier.
  */
 
@@ -25,9 +25,6 @@ export interface SearchProvider {
   ): Promise<SearchResult[]>;
 }
 
-/**
- * Exécute une recherche externe.
- */
 export async function searchWeb(
   provider: SearchProvider,
   query: string,
