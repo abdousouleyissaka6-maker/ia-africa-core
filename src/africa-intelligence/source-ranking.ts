@@ -1,8 +1,7 @@
 /**
  * IA AFRICA CORE — Source Ranking
  *
- * Classe les sources de recherche selon leur
- * pertinence et leur qualité apparente.
+ * Classe les sources selon leur pertinence.
  */
 
 import type {
@@ -21,6 +20,13 @@ export function rankSources(
 
   const normalizedQuery = normalize(query);
 
+  if (!normalizedQuery) {
+    return results.map((result) => ({
+      result,
+      score: result.score ?? 0,
+    }));
+  }
+
   return results
     .map((result) => {
 
@@ -31,21 +37,15 @@ export function rankSources(
         result.snippet ?? "",
       );
 
-      if (
-        title.includes(normalizedQuery)
-      ) {
+      if (title.includes(normalizedQuery)) {
         score += 5;
       }
 
-      if (
-        snippet.includes(normalizedQuery)
-      ) {
+      if (snippet.includes(normalizedQuery)) {
         score += 3;
       }
 
-      if (
-        result.url.startsWith("https://")
-      ) {
+      if (result.url.startsWith("https://")) {
         score += 1;
       }
 
