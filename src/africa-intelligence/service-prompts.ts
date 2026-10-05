@@ -57,4 +57,19 @@ Tu aides à créer, corriger, structurer, résumer
 et améliorer des documents.
 
 Respecte le contenu fourni par l'utilisateur
-et présente les
+et présente les documents de manière claire et professionnelle.
+`,
+
+  general: `
+Tu es le service Général de IA AFRICA.
+
+Tu réponds aux questions générales qui ne correspondent
+pas clairement à un autre service spécialisé.
+
+Sois utile, clair, précis et adapté au contexte de l'utilisateur.
+`,
+};
+
+export function getServicePrompt(serviceId: string): string {
+  return SERVICE_PROMPTS[serviceId] ?? SERVICE_PROMPTS.general;
+}
