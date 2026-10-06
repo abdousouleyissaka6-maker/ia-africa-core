@@ -2,19 +2,156 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>IA AFRICA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA AFRICA CORE</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #17202a;
+    }
+
+    header {
+      background: #0b5d3b;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 10px;
+      background: #0b5d3b;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #answer {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f0f3f5;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      min-height: 60px;
+    }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .service {
+      padding: 15px;
+      background: #eef5f1;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+  </style>
 </head>
+
 <body>
+
+<header>
   <h1>🌍 IA AFRICA</h1>
+  <p>IA AFRICA CORE — Le moteur de l'Afrique</p>
+</header>
 
-  <textarea id="message"
-    placeholder="Écrivez votre demande..."></textarea>
+<main>
 
-  <button id="send">Envoyer</button>
+  <div class="card">
 
-  <div id="answer"></div>
+    <h2>🧠 IA AFRICA CORE</h2>
 
-  <script src="/chat.js"></script>
+    <p>
+      Posez votre question simplement. IA AFRICA CORE comprend,
+      classe et traite votre demande.
+    </p>
+
+    <div class="services">
+      <div class="service">🎓 Éducation</div>
+      <div class="service">🌾 Agriculture</div>
+      <div class="service">💼 Business</div>
+      <div class="service">👷 Emploi</div>
+      <div class="service">🌍 Langues</div>
+      <div class="service">📄 Documents</div>
+    </div>
+
+    <br>
+
+    <textarea
+      id="message"
+      placeholder="Écrivez votre demande ici..."
+    ></textarea>
+
+    <button id="send">Envoyer à IA AFRICA CORE</button>
+
+    <div id="answer">
+      La réponse de IA AFRICA CORE apparaîtra ici.
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  IA AFRICA © 2026 — Intelligence africaine au service des Africains
+</footer>
+
+<script src="/chat.js"></script>
+
 </body>
 </html>
