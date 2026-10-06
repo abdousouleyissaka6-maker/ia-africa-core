@@ -7,9 +7,13 @@
     "nodejs_compat"
   ],
   "ai": {
-    "binding": "AI"
-  },
-  "observability": {
+  "binding": "AI"
+},
+"assets": {
+  "binding": "ASSETS",
+  "directory": "./public"
+},
+"observability": {
     "enabled": true
   }
 }
