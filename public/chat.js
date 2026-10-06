@@ -11,8 +11,8 @@ send.addEventListener("click", async () => {
   }
 
   send.disabled = true;
-  send.textContent = "Traitement...";
-  answer.textContent = "IA AFRICA réfléchit...";
+  send.textContent = "IA AFRICA réfléchit...";
+  answer.textContent = "🧠 IA AFRICA CORE analyse votre demande...";
 
   try {
     const response = await fetch("/api/chat", {
@@ -22,7 +22,8 @@ send.addEventListener("click", async () => {
       },
       body: JSON.stringify({
         type: "text",
-        content: content
+        content: content,
+        language: "fr"
       })
     });
 
@@ -30,21 +31,20 @@ send.addEventListener("click", async () => {
 
     if (!response.ok || !data.success) {
       throw new Error(
-        data.error || "Erreur lors de l'envoi."
+        data.error || "IA AFRICA CORE n'a pas pu traiter la demande."
       );
     }
 
-    answer.textContent =
-      data.answer || "Aucune réponse générée.";
+    answer.textContent = data.answer || "Aucune réponse générée.";
 
   } catch (error) {
     answer.textContent =
       error instanceof Error
-        ? error.message
-        : "Erreur de connexion avec IA AFRICA CORE.";
+        ? "⚠️ " + error.message
+        : "⚠️ Erreur de connexion avec IA AFRICA CORE.";
 
   } finally {
     send.disabled = false;
-    send.textContent = "Envoyer";
+    send.textContent = "Envoyer à IA AFRICA CORE";
   }
 });
