@@ -7,6 +7,9 @@ import {
 
 export interface Env {
   AI: CloudflareAI;
+  ASSETS: {
+    fetch: (request: Request) => Promise<Response>;
+  };
 }
 
 async function handleChat(request: Request, env: Env): Promise<Response> {
