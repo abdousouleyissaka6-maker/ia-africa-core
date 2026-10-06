@@ -91,16 +91,11 @@ export default {
     const url = new URL(request.url);
 
     if (
-      request.method === "GET" &&
-      url.pathname === "/"
-    ) {
-      return Response.json({
-        name: "IA AFRICA CORE",
-        status: "online",
-        message:
-          "Le moteur central de IA AFRICA est opérationnel.",
-      });
-    }
+  request.method === "GET" &&
+  url.pathname === "/"
+) {
+  return env.ASSETS.fetch(request);
+                          }
 
     if (
       request.method === "POST" &&
