@@ -96,7 +96,88 @@ export default {
 ) {
   return env.ASSETS.fetch(request);
                           }
+    if (url.pathname === "/api/satellite") {
+      if (request.method !== "GET") {
+        return Response.json(
+          { error: "Utilisez la méthode GET." },
+          { status: 405 },
+        );
+      }
 
+      const latParam = url.searchParams.get("lat");
+      const lonParam = url.searchParams.get("lon");
+      const lat = Number(latParam);
+      const lon = Number(lonParam);
+
+      if (
+        latParam === null ||
+        lonParam === null ||
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lon) ||
+        lat < -90 ||
+        lat > 90 ||
+        lon < -180 ||
+        lon > 180
+      ) {
+        return Response.json(
+          {
+            error: "Coordonnées invalides.",
+            exemple: "/api/satellite?lat=13.5116&lon=2.1254",
+          },
+          { status: 400 },
+        );
+      }
+
+      const date = new Date();
+      date.setUTCDate(date.getUTCDate() - 5);
+
+      const end = date.toISOString()
+        .slice(0, 10)
+        .replace(/-/g, "");
+
+      date.setUTCDate(date.getUTCDate() - 6);
+
+      const start = date.toISOString()
+        .slice(0, 10)
+        .replace(/-/g, "");
+
+      const nasa = new URL(
+        "https://power.larc.nasa.gov/api/temporal/daily/point",
+      );
+
+      nasa.searchParams.set(
+        "parameters",
+        "T2M,PRECTOTCORR,RH2M,WS2M",
+      );
+      nasa.searchParams.set("community", "AG");
+      nasa.searchParams.set("latitude", String(lat));
+      nasa.searchParams.set("longitude", String(lon));
+      nasa.searchParams.set("start", start);
+      nasa.searchParams.set("end", end);
+      nasa.searchParams.set("format", "JSON");
+
+      try {
+        const response = await fetch(nasa.toString());
+        const data = await response.text();
+
+        return new Response(data, {
+          status: response.ok ? 200 : 502,
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "public, max-age=300",
+          },
+        });
+      } catch {
+        return Response.json(
+          {
+            error:
+              "Le service NASA POWER est temporairement inaccessible.",
+          },
+          { status: 502 },
+        );
+      }
+    }
     if (
       request.method === "POST" &&
       url.pathname === "/api/chat"
