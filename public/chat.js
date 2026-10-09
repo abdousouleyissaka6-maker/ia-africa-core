@@ -3,48 +3,51 @@ const send = document.getElementById("send");
 const answer = document.getElementById("answer");
 
 send.addEventListener("click", async () => {
-  const content = message.value.trim();
+const content = message.value.trim();
 
-  if (!content) {
-    answer.textContent = "Écrivez d'abord votre demande.";
-    return;
-  }
+if (!content) {
+answer.textContent = "Écrivez d'abord votre demande.";
+return;
+}
 
-  send.disabled = true;
-  send.textContent = "IA AFRICA réfléchit...";
-  answer.textContent = "🧠 IA AFRICA CORE analyse votre demande...";
+// Effacer le champ immédiatement après la récupération du message
+message.value = "";
 
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        type: "text",
-        content: content,
-        language: "fr"
-      })
-    });
+send.disabled = true;
+send.textContent = "IA AFRICA réfléchit...";
+answer.textContent = "🧠 IA AFRICA CORE analyse votre demande...";
 
-    const data = await response.json();
+try {
+const response = await fetch("/api/chat", {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+type: "text",
+content: content,
+language: "fr"
+})
+});
 
-    if (!response.ok || !data.success) {
-      throw new Error(
-        data.error || "IA AFRICA CORE n'a pas pu traiter la demande."
-      );
-    }
+const data = await response.json();
 
-    answer.textContent = data.answer || "Aucune réponse générée.";
+if (!response.ok || !data.success) {
+  throw new Error(
+    data.error || "IA AFRICA CORE n'a pas pu traiter la demande."
+  );
+}
 
-  } catch (error) {
-    answer.textContent =
-      error instanceof Error
-        ? "⚠️ " + error.message
-        : "⚠️ Erreur de connexion avec IA AFRICA CORE.";
+answer.textContent = data.answer || "Aucune réponse générée.";
 
-  } finally {
-    send.disabled = false;
-    send.textContent = "Envoyer à IA AFRICA CORE";
-  }
+} catch (error) {
+answer.textContent =
+error instanceof Error
+? "⚠️ " + error.message
+: "⚠️ Erreur de connexion avec IA AFRICA CORE.";
+
+} finally {
+send.disabled = false;
+send.textContent = "Envoyer à IA AFRICA CORE";
+}
 });
