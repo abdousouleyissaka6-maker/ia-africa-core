@@ -171,5 +171,5 @@ function calculateConfidence(score: number, domain: string): number {
     return 0.8;
   }
 
-  return 0.7;
-    }
+ return 0.7;
+}
