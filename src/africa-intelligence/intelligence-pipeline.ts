@@ -101,7 +101,18 @@ export async function runAfricaCore(
         service.description +
         "\n\nINSTRUCTIONS SPÉCIALISÉES :\n" +
         servicePrompt +
-        "\n\nRÈGLES DE RÉPONSE :\n" +
+        "\n\nRÈGLES DE RÉPONSE RESPECT STRICT DES QUANTITÉS DEMANDÉES :
+  Si l'utilisateur demande 5, 10, 15, 20, 25 ou un autre nombre
+  d'éléments, fournis exactement ce nombre d'éléments.
+- Avant d'envoyer la réponse, vérifie que le nombre de points,
+  d'exemples, de questions, de réponses ou d'étapes correspond
+  exactement à la quantité demandée.
+- Ne remplace jamais une liste demandée de 10 éléments par
+  seulement 4 éléments.
+- Si la réponse est longue, développe les éléments de manière
+  concise pour pouvoir fournir la liste complète.
+- Pour une demande comportant plusieurs parties, réponds à toutes
+  les parties, sans en oublier. :\n" +
         "- Comprends la question avant de répondre.\n" +
         "- Réponds directement et clairement.\n" +
         "- Utilise les informations présentes dans le message.\n" +
