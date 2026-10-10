@@ -1,6 +1,5 @@
 /**
- * IA AFRICA CORE — Model Registry
- * Registre central des modèles IA utilisables par IA AFRICA.
+ * IA AFRICA CORE — Registre des modèles
  */
 
 export interface ModelDefinition {
@@ -12,20 +11,31 @@ export interface ModelDefinition {
   priority: number;
 }
 
+const ALL_CAPABILITIES = [
+  "general",
+  "education",
+  "agriculture",
+  "business",
+  "employment",
+  "languages",
+  "documents",
+  "health",
+  "science",
+  "technology",
+  "programming",
+  "law",
+  "history",
+  "geography",
+  "mathematics",
+  "research",
+];
+
 export const MODEL_REGISTRY: ModelDefinition[] = [
   {
-    id: "llama-3.2-3b",
+    id: "llama-3.3-70b-fast",
     provider: "cloudflare",
-    name: "@cf/meta/llama-3.2-3b-instruct",
-    capabilities: [
-      "general",
-      "education",
-      "agriculture",
-      "business",
-      "employment",
-      "languages",
-      "documents",
-    ],
+    name: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    capabilities: ALL_CAPABILITIES,
     enabled: true,
     priority: 100,
   },
