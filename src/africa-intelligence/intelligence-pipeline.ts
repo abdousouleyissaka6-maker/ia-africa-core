@@ -1,38 +1,46 @@
 /**
- * IA AFRICA CORE — Cloudflare Model Runner
- * Moteur de génération des réponses.
+ * IA AFRICA CORE — Registre des modèles
  */
 
-import type {
-  ModelMessage,
-  ModelRunner,
-} from "./model-engine";
-
-export interface CloudflareAI {
-  run(
-    model: string,
-    inputs: {
-      messages: ModelMessage[];
-      stream?: boolean;
-      temperature?: number;
-      top_p?: number;
-      max_tokens?: number;
-    },
-  ): Promise<unknown>;
+export interface ModelDefinition {
+  id: string;
+  provider: string;
+  name: string;
+  capabilities: string[];
+  enabled: boolean;
+  priority: number;
 }
 
-export function createCloudflareModelRunner(
-  ai: CloudflareAI,
-): ModelRunner {
-  return {
-    async run(model, request) {
-      return ai.run(model, {
-        messages: request.messages,
-        stream: request.stream ?? false,
-        temperature: 0.7,
-        top_p: 0.9,
-        max_tokens: 1024,
-      });
-    },
-  };
+const ALL_CAPABILITIES = [
+  "general",
+  "education",
+  "agriculture",
+  "business",
+  "employment",
+  "languages",
+  "documents",
+  "health",
+  "science",
+  "technology",
+  "programming",
+  "law",
+  "history",
+  "geography",
+  "mathematics",
+  "research",
+];
+
+export const MODEL_REGISTRY: ModelDefinition[] = [
+  {
+    id: "llama-3.2-3b",
+    provider: "cloudflare",
+    name: "@cf/meta/llama-3.2-3b-instruct",
+    capabilities: ALL_CAPABILITIES,
+    enabled: true,
+    priority: 100,
+  },
+];
+
+export function getAvailableModels(): ModelDefinition[] {
+  return MODEL_REGISTRY.filter((model) => model.enabled);
 }
