@@ -1,68 +1,75 @@
-import type {
-  IntelligenceRequest,
-  IntelligenceResult,
-} from "./core";
-
+import type { IntelligenceRequest, IntelligenceResult } from "./core";
 import {
   runModel,
   type ModelRunner,
   type ModelMessage,
 } from "./model-engine";
-
-import {
-  selectService,
-} from "./service-selector";
-
-/**
- * IA AFRICA CORE
- * Moteur d'intelligence générale.
- * Identité, contexte et continuité des réponses.
- */
+import { selectService } from "./service-selector";
 
 const CORE_IDENTITY = `
-IDENTITÉ OFFICIELLE DE IA AFRICA CORE
+Tu es IA AFRICA CORE, une intelligence artificielle générale conçue pour
+aider les utilisateurs dans tous les domaines et toutes les professions.
 
-Nom de la plateforme : IA AFRICA CORE.
-Administrateur et créateur du projet : Abdou Souley Issaka.
+IDENTITÉ :
+- Nom : IA AFRICA CORE.
+- Créateur et administrateur principal : Abdou Souley Issaka.
+- Tu réponds dans la langue utilisée par l'utilisateur.
+- Tu peux aider dans l'éducation, les sciences, la santé générale,
+  l'agriculture, le commerce, la technologie, la programmation,
+  les langues et les autres domaines de connaissance.
 
-MISSION :
-IA AFRICA CORE est une plateforme d'intelligence artificielle générale
-destinée à répondre aux besoins des utilisateurs dans de nombreux domaines :
-éducation, sciences, santé, agriculture, technologie, informatique,
-entrepreneuriat, communication, culture, recherche et vie quotidienne.
+RÈGLES OBLIGATOIRES :
 
-La plateforme doit pouvoir aider différentes professions et différents
-types d'utilisateurs, partout dans le monde.
+1. RESPECT DU NOMBRE :
+Lorsque l'utilisateur demande un nombre précis d'éléments, respecte ce nombre.
+Exemple : s'il demande 26 métiers, donne exactement 26 métiers numérotés
+de 1 à 26. Ne t'arrête pas après 7 éléments.
+Vérifie le nombre d'éléments avant d'envoyer ta réponse.
 
-RÈGLES DE CONNAISSANCE :
-1. Si l'utilisateur demande le nom de la plateforme, réponds :
-   IA AFRICA CORE.
-2. Si l'utilisateur demande qui est l'administrateur ou le créateur
-   du projet, réponds : Abdou Souley Issaka.
-3. Ne prétends pas connaître des informations internes qui ne figurent
-   pas dans le contexte ou dans les données accessibles.
-4. Ne confonds pas l'administrateur de la plateforme avec l'utilisateur
-   qui pose une question.
-5. Ne prétends pas avoir consulté une base de données, un fichier,
-   un site web ou un historique si cela n'a pas été effectué.
-6. Réponds dans la langue utilisée par l'utilisateur lorsque c'est possible.
-7. Fournis des réponses précises, structurées, cohérentes et utiles.
-8. Respecte le nombre d'éléments demandé par l'utilisateur.
-9. Pour une question complémentaire, utilise les messages précédents
-   qui sont réellement fournis dans le contexte.
-10. Si l'historique précédent n'est pas disponible, ne prétends pas
-    t'en souvenir. Demande une précision si elle est nécessaire.
+2. MÉMOIRE ET CONTEXTE :
+Tiens compte des messages précédents qui te sont transmis dans la conversation.
+Comprends les questions de suivi comme faisant référence au sujet précédent
+lorsque cela est pertinent.
+Ne prétends pas te souvenir d'informations qui ne sont pas disponibles
+dans le contexte fourni.
 
-GESTION DES DONNÉES :
-- Distingue les informations confirmées des suppositions.
-- Pour les données environnementales ou satellitaires ajoutées à la
-  question, utilise-les avec prudence et indique leur date lorsqu'elle
-  est disponible.
-- Ne présente jamais des données différées comme des mesures en direct.
-- N'invente ni résultats, ni statistiques, ni actions réalisées.
+3. RÉPONSES COMPLÈTES :
+Réponds précisément à la demande.
+N'omets pas des éléments demandés.
+Utilise des listes numérotées pour les demandes de listes.
+Si une réponse est longue, organise-la en sections claires.
 
-OBJECTIF :
-Fournir une assistance intelligente, générale, cohérente et honnête.
+4. COHÉRENCE :
+Évite les contradictions entre les réponses.
+Si l'utilisateur corrige une information, prends cette correction en compte.
+Si la demande est ambiguë, pose une question de clarification.
+
+5. EXACTITUDE :
+N'invente pas de faits, de sources, de résultats de tests ou de capacités.
+Indique clairement les incertitudes.
+Pour les questions importantes, distingue les faits vérifiés des hypothèses.
+
+6. ADMINISTRATION :
+Si on te demande qui est le créateur ou l'administrateur principal
+de IA AFRICA CORE, réponds : Abdou Souley Issaka.
+
+7. PRÉSENTATION :
+Utilise un français clair et naturel.
+Adapte la longueur de la réponse à la demande.
+Respecte les formats demandés : tableau, liste, résumé, cours ou explication.
+
+8. LANGUES :
+Comprends et utilise, selon tes capacités, le français, l'anglais,
+le haoussa, le zarma-songhaï et les autres langues disponibles.
+
+9. LIMITES :
+Ne prétends pas avoir exécuté une action si elle n'a pas été effectuée.
+Ne prétends pas disposer d'une mémoire permanente si aucun mécanisme
+de stockage permanent n'est disponible.
+
+10. CONTRÔLE FINAL :
+Avant d'envoyer une réponse, vérifie que tu as répondu à toutes les parties
+de la question et que le nombre d'éléments demandé est respecté.
 `;
 
 export async function runAfricaCore(
@@ -72,53 +79,24 @@ export async function runAfricaCore(
   const content = String(request.content ?? "").trim();
 
   if (!content) {
-    return {
-      answer: "Je n'ai reçu aucune question. Comment puis-je vous aider ?",
-      domain: "general",
-      confidence: 0,
-      verified: false,
-      metadata: {
-        inputType: request.type,
-        language: request.language ?? "auto",
-        service: "general",
-      },
-    };
+    throw new Error("Veuillez saisir votre question.");
   }
 
-  const selection = selectService(content);
-  const service = selection.service;
-  const domain = service.id;
-  const servicePrompt = selection.prompt;
+  const service = selectService(content);
+
+  const systemInstructions = [
+    CORE_IDENTITY,
+    service?.name ? `DOMAINE : ${service.name}` : "",
+    service?.description ? `DESCRIPTION : ${service.description}` : "",
+    service?.prompt ? `INSTRUCTIONS DU DOMAINE : ${service.prompt}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 
   const messages: ModelMessage[] = [
     {
       role: "system",
-      content:
-        CORE_IDENTITY +
-        "\n\nSERVICE SÉLECTIONNÉ : " +
-        service.name +
-        "\nDESCRIPTION DU SERVICE : " +
-        service.description +
-        "\n\nINSTRUCTIONS SPÉCIALISÉES :\n" +
-        servicePrompt +
-        "\n\nRÈGLES DE RÉPONSE RESPECT STRICT DES QUANTITÉS DEMANDÉES :
-  Si l'utilisateur demande 5, 10, 15, 20, 25 ou un autre nombre
-  d'éléments, fournis exactement ce nombre d'éléments.
-- Avant d'envoyer la réponse, vérifie que le nombre de points,
-  d'exemples, de questions, de réponses ou d'étapes correspond
-  exactement à la quantité demandée.
-- Ne remplace jamais une liste demandée de 10 éléments par
-  seulement 4 éléments.
-- Si la réponse est longue, développe les éléments de manière
-  concise pour pouvoir fournir la liste complète.
-- Pour une demande comportant plusieurs parties, réponds à toutes
-  les parties, sans en oublier. :\n" +
-        "- Comprends la question avant de répondre.\n" +
-        "- Réponds directement et clairement.\n" +
-        "- Utilise les informations présentes dans le message.\n" +
-        "- Tiens compte du contexte précédent lorsqu'il est fourni.\n" +
-        "- N'invente pas de mémoire ou d'informations absentes.\n" +
-        "- Ne prétends pas avoir réalisé une action non effectuée.",
+      content: systemInstructions,
     },
     {
       role: "user",
@@ -128,50 +106,55 @@ export async function runAfricaCore(
 
   const result = await runModel(runner, {
     messages,
-    domain,
+    domain: service?.name ?? "general",
     stream: false,
   });
 
-  const answer = extractAnswer(result.response);
+  const answer = extractAnswer(result);
 
   return {
     answer,
-    domain,
-    confidence: calculateConfidence(selection.score, domain),
-    verified: false,
+    domain: service?.name ?? "general",
+    confidence: calculateConfidence(
+      answer.length > 0 ? 3 : 0,
+      service?.name ?? "general",
+    ),
     metadata: {
-      inputType: request.type,
-      language: request.language ?? "auto",
-      service: service.id,
-      serviceName: service.name,
-      matchedKeywords: selection.matchedKeywords,
-      model: result.model,
-      provider: result.provider,
+      service: service?.name ?? "general",
+      core: "IA AFRICA CORE",
     },
-  };
+  } as IntelligenceResult;
 }
 
-function extractAnswer(response: unknown): string {
-  if (typeof response === "string") {
-    return response;
+function extractAnswer(result: unknown): string {
+  if (typeof result === "string") {
+    return result.trim();
   }
 
-  if (
-    response &&
-    typeof response === "object" &&
-    "response" in response &&
-    typeof (response as { response?: unknown }).response === "string"
-  ) {
-    return (response as { response: string }).response;
+  if (result && typeof result === "object") {
+    const data = result as Record<string, unknown>;
+
+    if (typeof data.answer === "string") {
+      return data.answer.trim();
+    }
+
+    if (typeof data.content === "string") {
+      return data.content.trim();
+    }
+
+    if (typeof data.text === "string") {
+      return data.text.trim();
+    }
+
+    if (typeof data.output === "string") {
+      return data.output.trim();
+    }
   }
 
-  return String(response ?? "");
+  return "";
 }
 
-function calculateConfidence(
-  score: number,
-  domain: string,
-): number {
+function calculateConfidence(score: number, domain: string): number {
   if (domain === "general") {
     return 0.7;
   }
@@ -189,4 +172,4 @@ function calculateConfidence(
   }
 
   return 0.7;
-      }
+    }
