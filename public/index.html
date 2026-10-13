@@ -431,5 +431,125 @@
       result.hidden = false;
     });
   </script>
-</body>
+<!-- PORTEFEUILLE IA AFRICA -->
+<style>
+#af-wallet-button {
+  position: fixed;
+  right: 14px;
+  bottom: 18px;
+  z-index: 9999;
+  border: 0;
+  border-radius: 24px;
+  padding: 13px 18px;
+  background: #13a879;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 3px 12px #0005;
+}
+#af-wallet {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #101820;
+  color: white;
+  padding: 22px;
+  overflow: auto;
+  font-family: Arial, sans-serif;
+}
+#af-wallet .wallet-card {
+  max-width: 440px;
+  margin: 25px auto;
+  background: #202c36;
+  padding: 22px;
+  border-radius: 18px;
+}
+#af-wallet select, #af-wallet input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 14px;
+  border-radius: 8px;
+  border: 1px solid #52616d;
+  background: #111b23;
+  color: white;
+}
+#af-wallet .wallet-action {
+  padding: 12px;
+  border: 0;
+  border-radius: 9px;
+  margin: 5px 3px 12px 0;
+  background: #13a879;
+  color: white;
+  font-weight: bold;
+}
+#af-wallet .wallet-close {
+  background: #56616a;
+}
+#af-wallet .wallet-note {
+  font-size: 13px;
+  color: #c4d0d8;
+  line-height: 1.5;
+}
+</style>
+
+<button id="af-wallet-button" onclick="document.getElementById('af-wallet').style.display='block'">
+  💰 Portefeuille
+</button>
+
+<div id="af-wallet">
+  <div class="wallet-card">
+    <h2>💰 Portefeuille IA Africa</h2>
+    <p>Solde de démonstration</p>
+
+    <label for="af-currency">Choisir la monnaie</label>
+    <select id="af-currency" onchange="afUpdateWallet()">
+      <option value="XOF">Franc CFA (FCFA)</option>
+      <option value="EUR">Euro (€)</option>
+      <option value="USD">Dollar américain ($)</option>
+    </select>
+
+    <h1 id="af-balance">0 FCFA</h1>
+    <p id="af-equivalent">Équivalents indicatifs : 0 € · 0 $</p>
+
+    <label for="af-amount">Montant</label>
+    <input id="af-amount" type="number" min="1" placeholder="Saisir un montant">
+
+    <button class="wallet-action" onclick="afDemoAction('Dépôt')">＋ Déposer</button>
+    <button class="wallet-action" onclick="afDemoAction('Retrait')">↗ Retirer</button>
+
+    <p class="wallet-note">
+      Version de démonstration : aucun paiement réel n'est effectué.
+      Le solde affiché n'est pas un compte bancaire. Les dépôts et
+      retraits seront activés après la connexion d'un service de paiement sécurisé.
+    </p>
+
+    <button class="wallet-action wallet-close"
+      onclick="document.getElementById('af-wallet').style.display='none'">
+      Fermer
+    </button>
+  </div>
+</div>
+
+<script>
+function afUpdateWallet() {
+  const currency = document.getElementById('af-currency').value;
+  const balance = document.getElementById('af-balance');
+  const equivalent = document.getElementById('af-equivalent');
+
+  if (currency === 'XOF') {
+    balance.textContent = '0 FCFA';
+  } else if (currency === 'EUR') {
+    balance.textContent = '0 €';
+  } else {
+    balance.textContent = '$0.00';
+  }
+
+  equivalent.textContent = 'Équivalents indicatifs : 0 € · 0 $';
+}
+
+function afDemoAction(action) {
+  alert(action + ' : les paiements réels ne sont pas encore activés sur IA Africa.');
+}
+</script></body>
           </html>
