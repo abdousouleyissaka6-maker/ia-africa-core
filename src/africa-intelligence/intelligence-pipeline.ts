@@ -31,6 +31,17 @@ export async function runAfricaCore(
   const selected = service.service;
 
   const systemInstructions = [
+CORE_IDENTITY,
+selected.name ? "DOMAINE : ${selected.name}" : "",
+selected.description
+? "DESCRIPTION : ${selected.description}"
+: "",
+service.prompt
+? "INSTRUCTIONS DU DOMAINE : ${service.prompt}"
+: "",
+]
+.filter(Boolean)
+.join("\n\n");
     CORE_IDENTITY,
     selected.name ? \`DOMAINE : \${selected.name}\` : "",
     selected.description
