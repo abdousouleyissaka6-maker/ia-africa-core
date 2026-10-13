@@ -1,3 +1,4 @@
+
 import type { IntelligenceRequest, IntelligenceResult } from "./core";
 import {
   runModel,
@@ -10,7 +11,7 @@ const CORE_IDENTITY = `
 Tu es IA AFRICA CORE, une intelligence artificielle générale.
 Tu aides les utilisateurs dans tous les domaines et toutes les professions.
 Tu réponds dans la langue utilisée par l'utilisateur.
-Respecte le nombre exact d'éléments demandé.
+Respecte exactement le nombre d'éléments demandé.
 Tiens compte du contexte transmis dans la conversation.
 Réponds clairement, précisément et complètement.
 N'invente pas de faits ni de sources.
@@ -31,35 +32,13 @@ export async function runAfricaCore(
   const selected = service.service;
 
   const systemInstructions = [
-CORE_IDENTITY,
-selected.name ? "DOMAINE : ${selected.name}" : "",
-selected.description
-? "DESCRIPTION : ${selected.description}"
-: "",
-service.prompt
-? "INSTRUCTIONS DU DOMAINE : ${service.prompt}"
-: "",
-]
-.filter(Boolean)
-.join("\n\n");
-CORE_IDENTITY,
-selected.name ? "DOMAINE : ${selected.name}" : "",
-selected.description
-? "DESCRIPTION : ${selected.description}"
-: "",
-service.prompt
-? "INSTRUCTIONS DU DOMAINE : ${service.prompt}"
-: "",
-]
-.filter(Boolean)
-.join("\n\n");
     CORE_IDENTITY,
-    selected.name ? \`DOMAINE : \${selected.name}\` : "",
+    selected.name ? `DOMAINE : ${selected.name}` : "",
     selected.description
-      ? \`DESCRIPTION : \${selected.description}\`
+      ? `DESCRIPTION : ${selected.description}`
       : "",
     service.prompt
-      ? \`INSTRUCTIONS DU DOMAINE : \${service.prompt}\`
+      ? `INSTRUCTIONS DU DOMAINE : ${service.prompt}`
       : "",
   ]
     .filter(Boolean)
@@ -83,6 +62,12 @@ service.prompt
   });
 
   const answer = extractAnswer(result);
+
+  if (!answer) {
+    throw new Error(
+      "IA AFRICA CORE n'a reçu aucune réponse du moteur de modèle.",
+    );
+  }
 
   return {
     answer,
@@ -127,7 +112,10 @@ function extractAnswer(result: unknown): string {
   return "";
 }
 
-function calculateConfidence(score: number, domain: string): number {
+function calculateConfidence(
+  score: number,
+  domain: string,
+): number {
   if (domain === "general") {
     return 0.7;
   }
@@ -146,3 +134,4 @@ function calculateConfidence(score: number, domain: string): number {
 
   return 0.7;
 }
+  
