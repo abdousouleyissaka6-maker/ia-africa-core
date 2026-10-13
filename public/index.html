@@ -1,157 +1,435 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IA AFRICA CORE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>IA Africa — Core & Studio</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f5f7fa;
-      color: #17202a;
+      background: #0b1120;
+      color: #f4f7ff;
     }
 
     header {
-      background: #0b5d3b;
-      color: white;
-      padding: 20px;
-      text-align: center;
+      padding: 18px;
+      background: #111c30;
+      border-bottom: 1px solid #29364b;
     }
 
-    header h1 {
-      margin: 0;
-      font-size: 28px;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    header p {
-      margin: 8px 0 0;
+    .logo {
+      width: 45px;
+      height: 45px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #00b894, #2878ff);
+      font-weight: bold;
+      font-size: 20px;
     }
+
+    h1 { font-size: 21px; margin: 0 0 5px; }
+    header p { margin: 0; color: #a9bad2; font-size: 13px; }
 
     main {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 20px;
+      max-width: 850px;
+      margin: auto;
+      padding: 18px;
     }
 
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    .welcome {
+      padding: 22px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #142b42, #182044);
+      margin-bottom: 18px;
     }
 
-    textarea {
-      width: 100%;
-      min-height: 140px;
-      padding: 15px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 16px;
-      resize: vertical;
+    .welcome h2 { margin-top: 0; font-size: 23px; }
+    .welcome p { color: #c4d2e5; line-height: 1.6; }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
     }
 
-    button {
-      margin-top: 15px;
-      padding: 14px 24px;
-      border: none;
-      border-radius: 10px;
-      background: #0b5d3b;
-      color: white;
-      font-size: 16px;
+    button, textarea, select { font: inherit; }
+
+    .tab {
+      background: #172338;
+      color: #dce7f7;
+      border: 1px solid #33445e;
+      border-radius: 12px;
+      padding: 13px 5px;
       cursor: pointer;
     }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    .tab.active {
+      background: #087f70;
+      border-color: #12b99f;
+      color: white;
     }
 
-    #answer {
-      margin-top: 20px;
-      padding: 15px;
-      background: #f0f3f5;
-      border-radius: 10px;
+    .panel {
+      background: #111c30;
+      border: 1px solid #29364b;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .panel h2 { margin-top: 0; font-size: 19px; }
+
+    #messages {
+      min-height: 210px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding: 10px 0;
+    }
+
+    .message {
+      padding: 12px 14px;
+      border-radius: 13px;
+      margin: 10px 0;
       white-space: pre-wrap;
-      min-height: 60px;
+      overflow-wrap: anywhere;
+      line-height: 1.55;
     }
 
-    .services {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    .user {
+      background: #164b63;
+      margin-left: 12%;
+    }
+
+    .ai { background: #202d42; margin-right: 5%; }
+
+    textarea, select {
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      border: 1px solid #3a4a63;
+      background: #0b1424;
+      color: white;
+      outline: none;
+    }
+
+    textarea { min-height: 95px; resize: vertical; }
+
+    .controls {
+      display: flex;
       gap: 10px;
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
-    .service {
+    .controls button {
+      flex: 1;
+      padding: 13px;
+      border: 0;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #send { background: #08a88c; color: white; }
+    #clear { background: #26344b; color: white; }
+    button:disabled { opacity: .55; cursor: wait; }
+
+    .studio-card {
+      background: #19263b;
+      border: 1px solid #33445e;
+      border-radius: 14px;
       padding: 15px;
-      background: #eef5f1;
-      border-radius: 10px;
-      text-align: center;
+      margin: 12px 0;
+    }
+
+    .studio-card p, .note {
+      color: #c1cee0;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .status {
+      color: #72dfbd;
+      font-size: 13px;
+      margin-top: 12px;
     }
 
     footer {
       text-align: center;
-      padding: 20px;
-      color: #666;
+      padding: 25px 12px;
+      color: #8799b2;
+      font-size: 12px;
+    }
+
+    @media (min-width: 600px) {
+      .tabs { grid-template-columns: repeat(6, 1fr); }
     }
   </style>
 </head>
 
 <body>
-
-<header>
-  <h1>🌍 IA AFRICA</h1>
-  <p>IA AFRICA CORE — Le moteur de l'Afrique</p>
-</header>
-
-<main>
-
-  <div class="card">
-
-    <h2>🧠 IA AFRICA CORE</h2>
-
-    <p>
-      Posez votre question simplement. IA AFRICA CORE comprend,
-      classe et traite votre demande.
-    </p>
-
-    <div class="services">
-      <div class="service">🎓 Éducation</div>
-      <div class="service">🌾 Agriculture</div>
-      <div class="service">💼 Business</div>
-      <div class="service">👷 Emploi</div>
-      <div class="service">🌍 Langues</div>
-      <div class="service">📄 Documents</div>
+  <header>
+    <div class="brand">
+      <div class="logo">IA</div>
+      <div>
+        <h1>IA AFRICA</h1>
+        <p>Core + Studio — Une plateforme, plusieurs possibilités</p>
+      </div>
     </div>
+  </header>
 
-    <br>
+  <main>
+    <section class="welcome">
+      <h2>Bienvenue dans IA Africa</h2>
+      <p>
+        Discutez, apprenez, travaillez et préparez vos projets.
+        Retrouvez les outils de conversation et les espaces de
+        création dans une seule interface.
+      </p>
+    </section>
 
-    <textarea
-      id="message"
-      placeholder="Écrivez votre demande ici..."
-    ></textarea>
+    <nav class="tabs" aria-label="Espaces IA Africa">
+      <button class="tab active" data-mode="chat">💬 Chat</button>
+      <button class="tab" data-mode="image">🖼️ Images</button>
+      <button class="tab" data-mode="video">🎬 Vidéos</button>
+      <button class="tab" data-mode="music">🎵 Musique</button>
+      <button class="tab" data-mode="voice">🎙️ Voix</button>
+      <button class="tab" data-mode="studio">✨ Studio</button>
+    </nav>
 
-    <button id="send">Envoyer à IA AFRICA CORE</button>
+    <section class="panel" id="chatPanel">
+      <h2>IA Africa Core</h2>
+      <p class="note">
+        Posez vos questions dans les domaines de l'éducation,
+        des sciences, de la technologie, du travail et de la vie
+        quotidienne.
+      </p>
 
-    <div id="answer">
-      La réponse de IA AFRICA CORE apparaîtra ici.
-    </div>
+      <label for="language">Langue de réponse</label>
+      <select id="language">
+        <option value="auto">Même langue que ma question</option>
+        <option value="français">Français</option>
+        <option value="anglais">English</option>
+        <option value="haoussa">Haoussa</option>
+        <option value="zarma">Zarma / Songhaï</option>
+      </select>
 
-  </div>
+      <div id="messages" aria-live="polite">
+        <div class="message ai">
+          Bonjour ! Je suis IA Africa. Quelle est votre question ?
+        </div>
+      </div>
 
-</main>
+      <label for="question">Votre message</label>
+      <textarea id="question"
+        placeholder="Écrivez votre question ici..."></textarea>
 
-<footer>
-  IA AFRICA © 2026 — Intelligence africaine au service des Africains
-</footer>
+      <div class="controls">
+        <button id="send">Envoyer ➤</button>
+        <button id="clear">Effacer</button>
+      </div>
 
-<script src="/chat.js"></script>
+      <p class="status" id="status" role="status"></p>
+    </section>
 
+    <section class="panel" id="studioPanel" hidden>
+      <h2 id="studioTitle">IA Africa Studio</h2>
+      <p class="note" id="studioDescription">
+        Choisissez un espace pour préparer votre projet créatif.
+      </p>
+
+      <div class="studio-card">
+        <strong id="featureTitle">Création multimédia</strong>
+        <p id="featureDescription">
+          Préparez votre idée et connectez le moteur de génération
+          correspondant pour produire votre contenu.
+        </p>
+      </div>
+
+      <label for="project">Décrivez votre projet</label>
+      <textarea id="project"
+        placeholder="Décrivez ce que vous souhaitez créer..."></textarea>
+
+      <div class="controls">
+        <button id="prepare">Préparer mon projet</button>
+      </div>
+
+      <div id="projectResult" class="message ai" hidden></div>
+
+      <p class="note">
+        Cet espace est une interface de préparation.
+        La génération réelle d'images, de vidéos, de musique ou de
+        voix nécessite la connexion d'un service compatible.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    IA AFRICA CORE + IA AFRICA STUDIO
+  </footer>
+
+  <script>
+    const tabs = document.querySelectorAll(".tab");
+    const chatPanel = document.getElementById("chatPanel");
+    const studioPanel = document.getElementById("studioPanel");
+    const messages = document.getElementById("messages");
+    const question = document.getElementById("question");
+    const send = document.getElementById("send");
+    const clear = document.getElementById("clear");
+    const status = document.getElementById("status");
+
+    let currentMode = "chat";
+
+    const modes = {
+      image: {
+        title: "Création d'images",
+        description: "Préparez une description pour une image.",
+        feature: "Générateur d'images",
+        detail: "Décrivez le sujet, le style, les couleurs et le format souhaités."
+      },
+      video: {
+        title: "Création de vidéos",
+        description: "Préparez le concept de votre prochaine vidéo.",
+        feature: "Générateur de vidéos",
+        detail: "Décrivez les scènes, les personnages, la durée et le style."
+      },
+      music: {
+        title: "Création musicale",
+        description: "Préparez les paroles ou le concept de votre musique.",
+        feature: "Studio musical",
+        detail: "Indiquez le genre musical, la langue, le rythme et l'ambiance."
+      },
+      voice: {
+        title: "Création vocale",
+        description: "Préparez un texte à lire avec une voix de synthèse.",
+        feature: "Générateur de voix",
+        detail: "Écrivez le texte et précisez la langue et le style de voix."
+      },
+      studio: {
+        title: "IA Africa Studio",
+        description: "Préparez vos projets créatifs au même endroit.",
+        feature: "Espace de création",
+        detail: "Rédigez votre idée pour préparer les étapes de réalisation."
+      }
+    };
+
+    tabs.forEach(function(tab) {
+      tab.addEventListener("click", function() {
+        currentMode = tab.dataset.mode;
+
+        tabs.forEach(function(item) {
+          item.classList.toggle("active", item === tab);
+        });
+
+        const isChat = currentMode === "chat";
+        chatPanel.hidden = !isChat;
+        studioPanel.hidden = isChat;
+
+        if (!isChat) {
+          const mode = modes[currentMode];
+          document.getElementById("studioTitle").textContent = mode.title;
+          document.getElementById("studioDescription").textContent =
+            mode.description;
+          document.getElementById("featureTitle").textContent = mode.feature;
+          document.getElementById("featureDescription").textContent =
+            mode.detail;
+          document.getElementById("project").placeholder = mode.detail;
+          document.getElementById("projectResult").hidden = true;
+        }
+      });
+    });
+
+    function addMessage(text, role) {
+      const element = document.createElement("div");
+      element.className = "message " + role;
+      element.textContent = text;
+      messages.appendChild(element);
+      messages.scrollTop = messages.scrollHeight;
+      return element;
+    }
+
+    async function sendMessage() {
+      const content = question.value.trim();
+      if (!content || send.disabled) return;
+
+      addMessage(content, "user");
+      question.value = "";
+      send.disabled = true;
+      status.textContent = "IA Africa prépare sa réponse...";
+      const waiting = addMessage("Réponse en cours...", "ai");
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "text",
+            content: content,
+            language: document.getElementById("language").value
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.success === false) {
+          throw new Error(data.error || "Le serveur a refusé la demande.");
+        }
+
+        waiting.textContent =
+          data.answer || data.content || "Aucune réponse reçue.";
+        status.textContent = "Réponse reçue.";
+      } catch (error) {
+        waiting.textContent =
+          "Impossible d'obtenir une réponse. Vérifiez la connexion et le moteur IA du serveur. Détail : " +
+          (error.message || "erreur inconnue");
+        status.textContent = "La demande a échoué.";
+      } finally {
+        send.disabled = false;
+        question.focus();
+      }
+    }
+
+    send.addEventListener("click", sendMessage);
+
+    question.addEventListener("keydown", function(event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+
+    clear.addEventListener("click", function() {
+      messages.replaceChildren();
+      addMessage("Conversation effacée. Posez votre question.", "ai");
+      status.textContent = "";
+    });
+
+    document.getElementById("prepare").addEventListener("click", function() {
+      const idea = document.getElementById("project").value.trim();
+      const result = document.getElementById("projectResult");
+
+      if (!idea) {
+        result.textContent = "Décrivez d'abord votre projet.";
+      } else {
+        result.textContent =
+          "Projet préparé — espace : " + modes[currentMode].title +
+          "\n\nVotre idée : " + idea +
+          "\n\nÉtape suivante : connecter un moteur de génération adapté pour produire le résultat.";
+      }
+
+      result.hidden = false;
+    });
+  </script>
 </body>
-</html>
+          </html>
