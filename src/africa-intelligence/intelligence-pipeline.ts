@@ -61,7 +61,35 @@ export async function runAfricaCore(
     stream: false,
   });
 
-  const answer = extractAnswer(result);
+  const answer = function extractAnswer(result: any): string {
+  if (typeof result === "string") {
+    return result.trim();
+  }
+
+  if (!result || typeof result !== "object") {
+    return "";
+  }
+
+  const candidates = [
+    result.answer,
+    result.content,
+    result.text,
+    result.output,
+    result.response,
+    result.response?.answer,
+    result.response?.content,
+    result.response?.text,
+    result.response?.output,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return "";
+  }result);
 
   if (!answer) {
     throw new Error(
