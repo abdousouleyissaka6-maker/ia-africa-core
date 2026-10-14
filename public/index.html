@@ -500,20 +500,34 @@ speakAnswer.addEventListener("click", function () {
     });
 
     document.getElementById("prepare").addEventListener("click", function() {
-      const idea = document.getElementById("project").value.trim();
-      const result = document.getElementById("projectResult");
+const idea = document.getElementById("project").value.trim();
+const result = document.getElementById("projectResult");
 
-      if (!idea) {
-        result.textContent = "Décrivez d'abord votre projet.";
-      } else {
-        result.textContent =
-          "Projet préparé — espace : " + modes[currentMode].title +
-          "\n\nVotre idée : " + idea +
-          "\n\nÉtape suivante : connecter un moteur de génération adapté pour produire le résultat.";
-      }
+if (!idea) {
+result.textContent = "Décrivez d'abord votre projet.";
+} else if (currentMode === "voice") {
+if ("speechSynthesis" in window) {
+window.speechSynthesis.cancel();
 
-      result.hidden = false;
-    });
+  const utterance = new SpeechSynthesisUtterance(idea);
+  utterance.lang = "fr-FR";
+
+  window.speechSynthesis.speak(utterance);
+
+  result.textContent = "Lecture vocale lancée.";
+} else {
+  result.textContent = "La lecture vocale n'est pas disponible sur ce navigateur.";
+}
+
+} else {
+result.textContent =
+"Projet préparé — espace : " + modes[currentMode].title +
+"\n\nVotre idée : " + idea +
+"\n\nLa prochaine étape consiste à connecter un moteur adapté à ce projet.";
+}
+
+result.hidden = false;
+});
   </script>
 <!-- PORTEFEUILLE IA AFRICA -->
 <style>
