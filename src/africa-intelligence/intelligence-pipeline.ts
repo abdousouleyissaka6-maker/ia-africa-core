@@ -75,7 +75,40 @@ core: "IA AFRICA CORE",
 }
 
 
-function extractAnswer(result: unknown): string {
+function extractAnswer(result: unknown): string {if (typeof result === "string") {
+return result.trim();
+}
+
+if (!result || typeof result !== "object") {
+return "";
+}
+
+const data = result as Record<string, unknown>;
+const response =
+data.response && typeof data.response === "object"
+? (data.response as Record<string, unknown>)
+: undefined;
+
+const candidates: unknown[] = [
+data.answer,
+data.content,
+data.text,
+data.output,
+response?.answer,
+response?.content,
+response?.text,
+response?.output,
+response?.response,
+];
+
+for (const candidate of candidates) {
+if (typeof candidate === "string" && candidate.trim()) {
+return candidate.trim();
+}
+}
+
+return "";
+}
   
 
 function calculateConfidence(
