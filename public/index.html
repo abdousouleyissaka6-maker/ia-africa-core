@@ -236,8 +236,10 @@
         placeholder="Écrivez votre question ici..."></textarea>
 
       <div class="controls">
-        <button id="send">Envoyer ➤</button>
-        <button id="clear">Effacer</button>
+  <button id="send">Envoyer ➤</button>
+  <button id="clear">Effacer</button>
+  <button id="voiceInput" type="button">🎙️ Parler</button>
+  <button id="speakAnswer" type="button">🔊 Lire la réponse</button>
       </div>
 
       <p class="status" id="status" role="status"></p>
@@ -400,7 +402,89 @@
       }
     }
 
-    send.addEventListener("click", sendMessage);
+    // FONCTION 1 : DICTÉE VOCALE
+const voiceInput = document.getElementById("voiceInput");
+const speakAnswer = document.getElementById("speakAnswer");
+
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+  const recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = "fr-FR";
+
+  recognition.onstart = function () {
+    voiceInput.textContent = "🎙️ Écoute...";
+    status.textContent = "Parlez maintenant.";
+  };
+
+  recognition.onresult = function (event) {
+    question.value = event.results[0][0].transcript;
+    status.textContent = "Question dictée. Appuyez sur Envoyer.";
+  };
+
+  recognition.onerror = function () {
+    status.textContent =
+      "Erreur du micro. Autorisez le microphone dans votre navigateur.";
+  };
+
+  recognition.onend = function () {
+    voiceInput.textContent = "🎙️ Parler";
+  };
+
+  voiceInput.addEventListener("click", function () {
+    try {
+      recognition.start();
+    } catch (error) {
+      status.textContent = "Réessayez dans quelques secondes.";
+    }
+  });
+} else {
+  voiceInput.addEventListener("click", function () {
+    status.textContent =
+      "Dictée vocale non prise en charge. Essayez Google Chrome.";
+  });
+}
+
+// FONCTION 2 : LECTURE VOCALE DE LA RÉPONSE
+speakAnswer.addEventListener("click", function () {
+  const answers = messages.querySelectorAll(".message.ai");
+  const lastAnswer = answers.length
+    ? answers[answers.length - 1].textContent.trim()
+    : "";
+
+  if (!lastAnswer) {
+    status.textContent = "Aucune réponse à lire.";
+    return;
+  }
+
+  if (!("speechSynthesis" in window)) {
+    status.textContent =
+      "Lecture vocale non prise en charge par ce navigateur.";
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(lastAnswer);
+  utterance.lang = "fr-FR";
+
+  utterance.onstart = function () {
+    status.textContent = "Lecture vocale en cours...";
+  };
+
+  utterance.onend = function () {
+    status.textContent = "Lecture terminée.";
+  };
+
+  utterance.onerror = function () {
+    status.textContent = "Erreur de lecture. Vérifiez le volume.";
+  };
+
+  window.speechSynthesis.speak(utterance);
+});send.addEventListener("click", sendMessage);
 
     question.addEventListener("keydown", function(event) {
       if (event.key === "Enter" && !event.shiftKey) {
