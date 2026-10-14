@@ -61,7 +61,7 @@ export async function runAfricaCore(
     stream: false,
   });
 
-  const answer = function extractAnswer(result: any): string {
+  const answer = extractAnswer(result);(result: any): string {
   if (typeof result === "string") {
     return result.trim();
   }
