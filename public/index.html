@@ -738,5 +738,45 @@ function afUpdateWallet() {
 function afDemoAction(action) {
   alert(action + ' : les paiements réels ne sont pas encore activés.');
 }
+</script><section id="imageStudio" style="max-width:700px;margin:24px auto;padding:20px;border-radius:16px;background:#111827;color:white;font-family:Arial,sans-serif">
+  <h2>🎨 IA Africa Core — Création d’images</h2>
+  <p>Décrivez l’image que vous souhaitez créer.</p>  <textarea id="imagePrompt" rows="4" placeholder="Exemple : une affiche éducative africaine avec des élèves dans une classe moderne..." style="width:100%;box-sizing:border-box;padding:12px;border-radius:10px"></textarea><label for="imageStyle" style="display:block;margin-top:12px">Style de l’image</label>
+<select id="imageStyle" style="width:100%;padding:12px;border-radius:8px">
+<option value="photoréaliste">Photo réaliste</option>
+<option value="illustration">Illustration</option>
+<option value="affiche publicitaire">Affiche publicitaire</option>
+<option value="dessin artistique">Dessin artistique</option>
+<option value="paysage">Paysage</option>
+<option value="portrait">Portrait</option>
+</select>
+
+<button id="generateImage" type="button" style="margin-top:14px;padding:12px 18px;border:0;border-radius:8px;background:#16a34a;color:white;font-weight:bold">Créer mon image</button>
+
+  <p id="imageStatus" role="status">Décrivez votre image pour commencer.</p>
+  <div id="imageResult"></div>
+</section><script>
+(function () {
+  const button = document.getElementById("generateImage");
+  const prompt = document.getElementById("imagePrompt");
+  const style = document.getElementById("imageStyle");
+  const status = document.getElementById("imageStatus");
+  const result = document.getElementById("imageResult");
+
+  button.addEventListener("click", function () {
+    const description = prompt.value.trim();
+
+    if (!description) {
+      status.textContent = "Décrivez d'abord l'image à créer.";
+      return;
+    }
+
+    status.textContent =
+      "Votre demande est prête. Le moteur de génération d'images doit être connecté pour produire l'image.";
+
+    result.textContent =
+      "Style choisi : " + style.value +
+      ". Description : " + description;
+  });
+})();
 </script></body>
           </html>
