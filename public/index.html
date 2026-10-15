@@ -404,49 +404,53 @@
 
     // FONCTION 1 : DICTÉE VOCALE
 const voiceInput = document.getElementById("voiceInput");
-const speakAnswer = document.getElementById("speakAnswer");
 
 const SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
+window.SpeechRecognition || window.webkitSpeechRecognition;
 
-if (SpeechRecognition) {
-  const recognition = new SpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = false;
-  recognition.lang = "fr-FR";
-
-  recognition.onstart = function () {
-    voiceInput.textContent = "🎙️ Écoute...";
-    status.textContent = "Parlez maintenant.";
-  };
-
-  recognition.onresult = function (event) {
-    question.value = event.results[0][0].transcript;
-    status.textContent = "Question dictée. Appuyez sur Envoyer.";
-  };
-
-  recognition.onerror = function () {
-    status.textContent =
-      "Erreur du micro. Autorisez le microphone dans votre navigateur.";
-  };
-
-  recognition.onend = function () {
-    voiceInput.textContent = "🎙️ Parler";
-  };
-
-  voiceInput.addEventListener("click", function () {
-    try {
-      recognition.start();
-    } catch (error) {
-      status.textContent = "Réessayez dans quelques secondes.";
-    }
-  });
-} else {
-  voiceInput.addEventListener("click", function () {
-    status.textContent =
-      "Dictée vocale non prise en charge. Essayez Google Chrome.";
-  });
+if (voiceInput) {
+voiceInput.addEventListener("click", function () {
+if (!SpeechRecognition) {
+status.textContent =
+"Dictée vocale non prise en charge. Essayez Google Chrome.";
+return;
 }
+
+const recognition = new SpeechRecognition();
+recognition.continuous = false;
+recognition.interimResults = false;
+recognition.lang = "fr-FR";
+
+recognition.onstart = function () {
+  voiceInput.textContent = "🎙️ Écoute...";
+  status.textContent = "Parlez maintenant.";
+};
+
+recognition.onresult = function (event) {
+  question.value = event.results[0][0].transcript;
+  status.textContent = "Question dictée. Appuyez sur Envoyer.";
+};
+
+recognition.onerror = function (event) {
+  status.textContent =
+    event.error === "not-allowed"
+      ? "Autorisez le microphone dans les paramètres du navigateur."
+      : "Erreur du microphone. Réessayez.";
+};
+
+recognition.onend = function () {
+  voiceInput.textContent = "🎙️ Parler";
+};
+
+try {
+  recognition.start();
+} catch (error) {
+  voiceInput.textContent = "🎙️ Parler";
+  status.textContent = "Impossible de démarrer le microphone. Réessayez.";
+}
+
+});
+    }
 
 // FONCTION 2 : LECTURE VOCALE DE LA RÉPONSE
 speakAnswer.addEventListener("click", function () {
