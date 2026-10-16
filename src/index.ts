@@ -377,8 +377,29 @@ export default {
       return handleWhatsAppWebhook(request, env);
     }
 
-    if (request.method === "GET" && url.pathname === "/") {
-      return env.ASSETS.fetch(request);
+    if (
+  request.method === "GET" &&
+  (url.pathname === "/" || url.pathname === "/index.html")
+) {
+  const assetUrl = new URL("/index.html", url.origin);
+  const assetResponse = await env.ASSETS.fetch(
+    new Request(assetUrl.toString(), request)
+  );
+
+  if (assetResponse.ok) {
+    return new Response(assetResponse.body, {
+      status: assetResponse.status,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-cache"
+      }
+    });
+  }
+
+  return new Response("Page d'accueil introuvable : vérifiez public/index.html.", {
+    status: 500
+  });
+    }
     }
 
     if (url.pathname === "/api/satellite") {
