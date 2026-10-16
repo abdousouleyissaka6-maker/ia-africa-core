@@ -14,12 +14,9 @@
     "binding": "ASSETS",
     "directory": "./public"
   },
-  "vars": {
-    "WHATSAPP_PHONE_NUMBER_ID": "",
-    "WHATSAPP_VERIFY_TOKEN": ""
-  },
   "observability": {
     "enabled": true
   }
 }
+
   
