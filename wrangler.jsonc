@@ -1,3 +1,4 @@
+
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "ia-africa-core",
@@ -7,13 +8,18 @@
     "nodejs_compat"
   ],
   "ai": {
-  "binding": "AI"
-},
-"assets": {
-  "binding": "ASSETS",
-  "directory": "./public"
-},
-"observability": {
+    "binding": "AI"
+  },
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./public"
+  },
+  "vars": {
+    "WHATSAPP_PHONE_NUMBER_ID": "",
+    "WHATSAPP_VERIFY_TOKEN": ""
+  },
+  "observability": {
     "enabled": true
   }
 }
+  
