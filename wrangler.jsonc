@@ -14,9 +14,10 @@
     "binding": "ASSETS",
     "directory": "./public"
   },
+  "vars": {
+    "WHATSAPP_VERIFY_TOKEN": "IAAfricaWebhook2026Niger"
+  },
   "observability": {
     "enabled": true
   }
 }
-
-  
