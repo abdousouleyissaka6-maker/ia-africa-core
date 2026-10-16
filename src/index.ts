@@ -380,7 +380,7 @@ export default {
     if (
   request.method === "GET" &&
   (url.pathname === "/" || url.pathname === "/index.html")
-) {
+{
   const assetUrl = new URL("/index.html", url.origin);
   const assetResponse = await env.ASSETS.fetch(
     new Request(assetUrl.toString(), request)
