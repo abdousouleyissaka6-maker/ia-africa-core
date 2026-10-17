@@ -15,7 +15,8 @@
     "directory": "./public"
   },
   "vars": {
-    "WHATSAPP_VERIFY_TOKEN": "IAAfricaWebhook2026Niger"
+    "WHATSAPP_VERIFY_TOKEN": "IAAfricaWebhook2026Niger",
+    "WHATSAPP_PHONE_NUMBER_ID": "1294044390468463"
   },
   "observability": {
     "enabled": true
