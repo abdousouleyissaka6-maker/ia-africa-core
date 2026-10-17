@@ -369,11 +369,15 @@ async function handleWhatsAppWebhook(
   return Response.json({ success: true, received: true });
 }
 
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    
+    if (url.pathname === "/webhook") {
+      return handleWhatsAppWebhook(request, env);
+    }
+
     if (
       request.method === "GET" &&
       (url.pathname === "/" || url.pathname === "/index.html")
@@ -399,33 +403,11 @@ export default {
       );
     }
 
-
-  const assetUrl = new URL("/index.html", url.origin);
-  const assetResponse = await env.ASSETS.fetch(
-    new Request(assetUrl.toString(), request)
-  );
-
-  if (assetResponse.ok) {
-    return new Response(assetResponse.body, {
-      status: assetResponse.status,
-      headers: {
-        "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "no-cache"
-      }
-    });
-  }
-
-  return new Response("Page d'accueil introuvable : vérifiez public/index.html.", {
-    status: 500
-  });
-    }
-    }
-
     if (url.pathname === "/api/satellite") {
       if (request.method !== "GET") {
         return Response.json(
           { error: "Utilisez la méthode GET." },
-          { status: 405 },
+          { status: 405 }
         );
       }
 
@@ -447,25 +429,24 @@ export default {
         return Response.json(
           {
             error: "Coordonnées invalides.",
-            exemple: "/api/satellite?lat=13.5116&lon=2.1254",
+            exemple: "/api/satellite?lat=13.5116&lon=2.1254"
           },
-          { status: 400 },
+          { status: 400 }
         );
       }
 
       try {
         const data = await getSatelliteData(lat, lon);
-
         return Response.json(data, {
           headers: {
             "Access-Control-Allow-Origin": "*",
-            "Cache-Control": "public, max-age=300",
-          },
+            "Cache-Control": "public, max-age=300"
+          }
         });
       } catch {
         return Response.json(
           { error: "Le service NASA POWER est temporairement inaccessible." },
-          { status: 502 },
+          { status: 502 }
         );
       }
     }
@@ -477,10 +458,11 @@ export default {
     return Response.json(
       {
         error: "Route introuvable.",
-        routes: ["/", "/api/chat", "/api/satellite", "/webhook"],
+        routes: ["/", "/api/chat", "/api/satellite", "/webhook"]
       },
-      { status: 404 },
+      { status: 404 }
     );
-  },
+  }
 };
+
       
