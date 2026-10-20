@@ -403,7 +403,7 @@ async function handleRunwayVideo(
       }
 
       const response = await fetch(
-        "https://api.dev.runwayml.com/v1/image_to_video",
+        "https://api.dev.runwayml.com/v1/text_to_video",
         {
           method: "POST",
           headers,
