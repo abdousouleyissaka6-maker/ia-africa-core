@@ -503,26 +503,97 @@ speakAnswer.addEventListener("click", function () {
       status.textContent = "";
     });
 
-    document.getElementById("prepare").addEventListener("click", function() {
+    document.getElementById("prepare").addEventListener("click", async function() {
 const idea = document.getElementById("project").value.trim();
 const result = document.getElementById("projectResult");
 
 if (!idea) {
 result.textContent = "Décrivez d'abord votre projet.";
-} else if (currentMode === "voice") {
-if ("speechSynthesis" in window) {
-window.speechSynthesis.cancel();
-
-  const utterance = new SpeechSynthesisUtterance(idea);
-  utterance.lang = "fr-FR";
-
-  window.speechSynthesis.speak(utterance);
-
-  result.textContent = "Lecture vocale lancée.";
-} else {
-  result.textContent = "La lecture vocale n'est pas disponible sur ce navigateur.";
+result.hidden = false;
+return;
 }
 
+if (currentMode === "video") {
+result.textContent = "Demande envoyée à Runway. Génération vidéo en cours...";
+result.hidden = false;
+
+try {
+  const startResponse = await fetch("/api/video", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt: idea })
+  });
+
+  const startData = await startResponse.json();
+
+  if (!startResponse.ok || !startData.id) {
+    throw new Error(startData.error || "Impossible de lancer la vidéo.");
+  }
+
+  const taskId = startData.id;
+  let taskData = null;
+
+  for (let attempt = 0; attempt < 40; attempt++) {
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    const statusResponse = await fetch(
+      "/api/video?taskId=" + encodeURIComponent(taskId)
+    );
+
+    taskData = await statusResponse.json();
+
+    if (!statusResponse.ok) {
+      throw new Error(taskData.error || "Erreur de vérification.");
+    }
+
+    if (taskData.status === "SUCCEEDED") break;
+
+    if (taskData.status === "FAILED" || taskData.status === "CANCELED") {
+      throw new Error("Runway n'a pas terminé la vidéo.");
+    }
+
+    result.textContent = "Génération en cours : " + (taskData.status || "en attente");
+  }
+
+  if (!taskData || taskData.status !== "SUCCEEDED" ||
+      !Array.isArray(taskData.output) || !taskData.output[0]) {
+    throw new Error("Vidéo non prête. Réessayez plus tard.");
+  }
+
+  result.replaceChildren();
+
+  const message = document.createElement("p");
+  message.textContent = "Vidéo créée avec succès !";
+
+  const link = document.createElement("a");
+  link.href = taskData.output[0];
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.textContent = "Ouvrir ou télécharger la vidéo";
+
+  result.append(message, link);
+  result.hidden = false;
+  return;
+
+} catch (error) {
+  result.textContent = "Erreur vidéo : " +
+    (error instanceof Error ? error.message : "Veuillez réessayer.");
+  result.hidden = false;
+  return;
+}
+
+}
+
+if (currentMode === "voice") {
+if ("speechSynthesis" in window) {
+window.speechSynthesis.cancel();
+const utterance = new SpeechSynthesisUtterance(idea);
+utterance.lang = "fr-FR";
+window.speechSynthesis.speak(utterance);
+result.textContent = "Lecture vocale lancée.";
+} else {
+result.textContent = "La lecture vocale n'est pas disponible sur ce navigateur.";
+}
 } else {
 result.textContent =
 "Projet préparé — espace : " + modes[currentMode].title +
