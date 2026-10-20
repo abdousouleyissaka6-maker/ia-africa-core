@@ -410,7 +410,7 @@ async function handleRunwayVideo(
           body: JSON.stringify({
             model: "gen4.5",
             promptText: prompt,
-            ratio: "1280:768",
+            ratio: "1280:720",
             duration: 5,
           }),
         },
