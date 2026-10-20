@@ -576,8 +576,19 @@ try {
   return;
 
 } catch (error) {
-  result.textContent = "Erreur vidéo : " +
-    (error instanceof Error ? error.message : "Veuillez réessayer.");
+  const errorMessage =
+  error instanceof Error ? error.message : "Veuillez réessayer.";
+
+result.replaceChildren();
+
+const errorTitle = document.createElement("p");
+errorTitle.textContent = "La vidéo n'a pas pu être créée.";
+
+const errorDetails = document.createElement("p");
+errorDetails.textContent = errorMessage;
+
+result.append(errorTitle, errorDetails);
+result.hidden = false;
   result.hidden = false;
   return;
 }
