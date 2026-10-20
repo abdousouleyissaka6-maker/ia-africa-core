@@ -14,7 +14,7 @@ export interface Env {
   WHATSAPP_ACCESS_TOKEN?: string;
   WHATSAPP_PHONE_NUMBER_ID?: string;
   WHATSAPP_VERIFY_TOKEN?: string;
-}
+ } RUNWAY_API_KEY?: string; 
 
 const NASA_POWER_URL =
   "https://power.larc.nasa.gov/api/temporal/daily/point";
@@ -369,11 +369,102 @@ async function handleWhatsAppWebhook(
   return Response.json({ success: true, received: true });
 }
 
+async function handleRunwayVideo(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  if (!env.RUNWAY_API_KEY) {
+    return Response.json(
+      { error: "La clé Runway n'est pas configurée dans Cloudflare." },
+      { status: 500 },
+    );
+  }
 
+  const headers = {
+    Authorization: "Bearer " + env.RUNWAY_API_KEY,
+    "X-Runway-Version": "2024-11-06",
+    "Content-Type": "application/json",
+  };
+
+  try {
+    if (request.method === "POST") {
+      const body = (await request.json()) as {
+        prompt?: string;
+      };
+
+      const prompt = body.prompt?.trim();
+
+      if (!prompt || prompt.length > 1000) {
+        return Response.json(
+          { error: "Saisissez une description de 1 à 1000 caractères." },
+          { status: 400 },
+        );
+      }
+
+      const response = await fetch(
+        "https://api.dev.runwayml.com/v1/image_to_video",
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            model: "gen4.5",
+            promptText: prompt,
+            ratio: "1280:720",
+            duration: 5,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return Response.json(
+          { error: "Runway n'a pas pu lancer la vidéo.", details: data },
+          { status: response.status },
+        );
+      }
+
+      return Response.json(data, { status: 202 });
+    }
+
+    if (request.method === "GET") {
+      const taskId = new URL(request.url).searchParams.get("taskId");
+
+      if (!taskId || !/^[a-zA-Z0-9_-]+$/.test(taskId)) {
+        return Response.json(
+          { error: "Identifiant de tâche invalide." },
+          { status: 400 },
+        );
+      }
+
+      const response = await fetch(
+        "https://api.dev.runwayml.com/v1/tasks/" +
+          encodeURIComponent(taskId),
+        { headers },
+      );
+
+      const data = await response.json();
+
+      return Response.json(data, { status: response.status });
+    }
+
+    return Response.json(
+      { error: "Utilisez POST ou GET." },
+      { status: 405 },
+    );
+  } catch {
+    return Response.json(
+      { error: "Impossible de contacter Runway pour le moment." },
+      { status: 502 },
+    );
+  }
+}
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-
+if (url.pathname === "/api/video") {
+  return handleRunwayVideo(request, env);
+}
     if (url.pathname === "/webhook") {
       return handleWhatsAppWebhook(request, env);
     }
