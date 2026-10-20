@@ -527,8 +527,16 @@ try {
   const startData = await startResponse.json();
 
   if (!startResponse.ok || !startData.id) {
-    throw new Error(startData.error || "Impossible de lancer la vidéo.");
-  }
+    const details = startData.details
+        ? JSON.stringify(startData.details)
+        : "";
+
+    throw new Error(
+        [startData.error || "Impossible de lancer la vidéo.", details]
+            .filter(Boolean)
+            .join(" — ")
+    );
+    }
 
   const taskId = startData.id;
   let taskData = null;
