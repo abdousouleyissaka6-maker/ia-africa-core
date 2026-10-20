@@ -64,83 +64,73 @@ export interface ModelRunner {
  *    si le modèle principal échoue.
  */
 export async function runModel(
-  runner: ModelRunner,
-  request: ModelRequest,
+runner: ModelRunner,
+request: ModelRequest,
 ): Promise<ModelExecutionResult> {
+const availableModels = getAvailableModels();
 
-  const availableModels = getAvailableModels();
+if (availableModels.length === 0) {
+throw new Error("Aucun modèle IA disponible.");
+}
 
-  if (availableModels.length === 0) {
-    throw new Error("Aucun modèle IA disponible.");
-  }
+const healthyModels = getHealthyModels();
 
-  const healthyModels = getHealthyModels();
+if (healthyModels.length === 0) {
+throw new Error("Aucun modèle IA opérationnel.");
+}
 
-  if (healthyModels.length === 0) {
-    throw new Error("Aucun modèle IA opérationnel.");
-  }
+const healthyIds = new Set(
+healthyModels.map((model) => model.id),
+);
 
-  const selected = selectModel(request.domain);
+const selected = selectModel(request.domain);
+const rankedModels = rankModels(request.domain);
+const fallbackModels = getFallbackModels(selected.id);
 
-  const rankedModels = rankModels(request.domain);
+const orderedModels: ModelDefinition[] = [
+...(healthyIds.has(selected.id) ? [selected] : []),
+...rankedModels.filter(
+(model) => model.enabled && healthyIds.has(model.id),
+),
+...fallbackModels.filter(
+(model) => model.enabled && healthyIds.has(model.id),
+),
+];
 
-  const fallbackModels = getFallbackModels(selected.id);
+const uniqueModels = orderedModels.filter(
+(model, index, array) =>
+array.findIndex((item) => item.id === model.id) === index,
+);
 
-  const orderedModels: ModelDefinition[] = [
-    selected,
+if (uniqueModels.length === 0) {
+throw new Error("Aucun modèle IA opérationnel disponible pour cette demande.");
+}
 
-    ...rankedModels.filter(
-      (model) =>
-        model.id !== selected.id &&
-        model.enabled,
-    ),
+const errors: string[] = [];
 
-    ...fallbackModels.filter(
-      (model) =>
-        model.id !== selected.id &&
-        model.enabled,
-    ),
-  ];
+for (const model of uniqueModels) {
+try {
+const response = await runner.run(model.name, {
+messages: request.messages,
+stream: request.stream ?? false,
+});
 
-  const uniqueModels = orderedModels.filter(
-    (model, index, array) =>
-      array.findIndex(
-        (item) => item.id === model.id,
-      ) === index,
-  );
-
-  const errors: string[] = [];
-
-  for (const model of uniqueModels) {
-    try {
-
-      const response = await runner.run(
-        model.name,
-        {
-          messages: request.messages,
-          stream: request.stream ?? false,
-        },
-      );
-
-      return {
-        model: model.name,
-        provider: model.provider,
-        response,
-      };
-
-    } catch (error) {
-
-      errors.push(
-        `${model.name}: ${
-          error instanceof Error
-            ? error.message
-            : String(error)
-        }`,
-      );
-    }
-  }
-
-  throw new Error(
-    `Tous les modèles IA ont échoué. ${errors.join(" | ")}`,
+  return {
+    model: model.name,
+    provider: model.provider,
+    response,
+  };
+} catch (error) {
+  errors.push(
+    `${model.name}: ${
+      error instanceof Error ? error.message : String(error)
+    }`,
   );
 }
+
+}
+
+throw new Error(
+"Tous les modèles IA opérationnels ont échoué. ${errors.join(" | ")}",
+);
+  }
