@@ -131,6 +131,6 @@ stream: request.stream ?? false,
 }
 
 throw new Error(
-"Tous les modèles IA opérationnels ont échoué. ${errors.join(" | ")}",
+  `Tous les modèles IA opérationnels ont échoué. ${errors.join(" | ")}`,
 );
-  }
+  
