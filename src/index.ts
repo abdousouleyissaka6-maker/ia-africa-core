@@ -286,6 +286,23 @@ async function handleWhatsAppWebhook(
 
   for (const entry of payload?.entry ?? []) {
     for (const change of entry?.changes ?? []) {
+      for (const status of change?.value?.statuses ?? []) {
+        console.log("Statut de livraison WhatsApp :", {
+          status: status.status,
+          recipient: status.recipient_id,
+          messageId: status.id,
+          errors: status.errors?.map((error: any) => ({
+            code: error.code,
+            title: error.title,
+            details: error.message,
+          })) ?? [],
+        });
+      }
+    }
+  }
+    
+  for (const entry of payload?.entry ?? []) {
+    for (const change of entry?.changes ?? []) {
       for (const message of change?.value?.messages ?? []) {
         if (
           message?.type !== "text" ||
