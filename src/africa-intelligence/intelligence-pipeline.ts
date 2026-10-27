@@ -21,7 +21,20 @@ throw new Error("Veuillez saisir votre question.");
 const service = selectService(content);
 const selected = service.service;
 
+
 const systemInstructions = [
+  CORE_IDENTITY,
+  selected.name ? `DOMAINE : ${selected.name}` : "",
+  selected.description
+    ? `DESCRIPTION : ${selected.description}`
+    : "",
+  service.prompt
+    ? `INSTRUCTIONS DU DOMAINE : ${service.prompt}`
+    : "",
+  ]
+  .filter(Boolean)
+  .join("\n\n");
+  
 CORE_IDENTITY,
 selected.name ? "DOMAINE : ${selected.name}" : "",
 selected.description
