@@ -354,12 +354,25 @@ async function handleWhatsAppWebhook(
             },
           );
 
-          if (!sendResponse.ok) {
-            console.error(
-              "Erreur d'envoi WhatsApp:",
-              await sendResponse.text(),
-            );
-          }
+          
+if (!sendResponse.ok) {
+  const sendError = await sendResponse.text();
+
+  console.error(
+    "Erreur d'envoi WhatsApp (HTTP " +
+      sendResponse.status +
+      "):",
+    sendError,
+  );
+} else {
+  const sendData = await sendResponse.json();
+
+  console.log("Réponse WhatsApp envoyée.", {
+    recipient: message.from,
+    messageId: sendData?.messages?.[0]?.id ?? null,
+  });
+}
+          
         } catch (error) {
           console.error("Erreur de réponse WhatsApp:", error);
         }
