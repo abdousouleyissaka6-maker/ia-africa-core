@@ -1,6 +1,6 @@
 
 /**
- * IA AFRICA CORE — Cloudflare Model Runner
+ * IA AFRICA CORE — Cloudflare and OpenAI Model Runner
  */
 
 import type {
@@ -35,6 +35,7 @@ N'invente ni faits ni sources.
 
 export function createCloudflareModelRunner(
   ai: CloudflareAI,
+  openaiApiKey?: string,
 ): ModelRunner {
   return {
     async run(model, request) {
@@ -42,10 +43,56 @@ export function createCloudflareModelRunner(
         index === 0 && message.role === "system"
           ? {
               ...message,
-              content: message.content + "\n\n" + RESPONSE_INSTRUCTIONS,
+              content:
+                message.content + "\n\n" + RESPONSE_INSTRUCTIONS,
             }
           : message,
       );
+
+      if (model.startsWith("gpt-")) {
+        if (!openaiApiKey) {
+          throw new Error("La clé API OpenAI est absente.");
+        }
+
+        const response = await fetch(
+          "https://api.openai.com/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${openaiApiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model,
+              messages,
+              max_completion_tokens: 2048,
+              store: false,
+            }),
+          },
+        );
+
+        const raw = await response.text();
+
+        let data: unknown;
+        try {
+          data = raw ? JSON.parse(raw) : {};
+        } catch {
+          throw new Error("Réponse OpenAI illisible.");
+        }
+
+        if (!response.ok) {
+          const errorData = data as {
+            error?: { message?: string };
+          };
+
+          throw new Error(
+            errorData.error?.message ||
+              `Erreur OpenAI : ${response.status}`,
+          );
+        }
+
+        return data;
+      }
 
       return ai.run(model, {
         messages,
