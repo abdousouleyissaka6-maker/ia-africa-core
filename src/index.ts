@@ -226,7 +226,7 @@ async function handleChat(
         typeof input.sessionId === "string" ? input.sessionId : undefined,
     };
 
-    const runner = createCloudflareModelRunner(env.AI);
+    const runner = createCloudflareModelRunner(env.AI, env.OPENAI_API_KEY);
     const result = await runAfricaCore(intelligenceRequest, runner);
 
     return Response.json({ success: true, ...result });
