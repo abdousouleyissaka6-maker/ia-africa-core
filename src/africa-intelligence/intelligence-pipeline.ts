@@ -92,9 +92,14 @@ function extractAnswer(result: unknown): string {
       ? (data.response as Record<string, unknown>)
       : undefined;
 
-  const choices = Array.isArray(data.choices)
-    ? data.choices
-    : [];
+  const payload =
+  data.response && typeof data.response === "object"
+    ? (data.response as Record<string, unknown>)
+    : data;
+
+const choices = Array.isArray(payload.choices)
+  ? payload.choices
+  : [];
 
   const firstChoice =
     choices[0] && typeof choices[0] === "object"
