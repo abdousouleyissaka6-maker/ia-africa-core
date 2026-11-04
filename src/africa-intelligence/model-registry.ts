@@ -1,3 +1,4 @@
+
 /**
  * IA AFRICA CORE — Registre des modèles
  */
@@ -32,6 +33,14 @@ const ALL_CAPABILITIES = [
 
 export const MODEL_REGISTRY: ModelDefinition[] = [
   {
+    id: "openai-gpt-5.4-mini",
+    provider: "openai",
+    name: "gpt-5.4-mini",
+    capabilities: ALL_CAPABILITIES,
+    enabled: true,
+    priority: 120,
+  },
+  {
     id: "llama-3.3-70b-fast",
     provider: "cloudflare",
     name: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
@@ -44,3 +53,4 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
 export function getAvailableModels(): ModelDefinition[] {
   return MODEL_REGISTRY.filter((model) => model.enabled);
 }
+
