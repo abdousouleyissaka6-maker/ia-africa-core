@@ -193,6 +193,90 @@ async function getWebSearchContext(
   if (!CURRENT_INFO_PATTERN.test(message)) return null;
 
   if (!apiKey) {
+    console.error("TAVILY : clé API absente.");
+    return "La recherche Internet n'est pas configurée. Ne prétendez pas avoir vérifié les informations actuelles.";
+  }
+
+  const query = message
+    .replace(/donne[zr]?\s+(?:moi\s+)?(?:trois|3|cinq|5)\s+sources[^.?!]*/gi, "")
+    .replace(/avec leurs liens directs/gi, "")
+    .replace(/et leurs dates de publication/gi, "")
+    .replace(/réponds? uniquement[^.?!]*/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  try {
+    const response = await fetch("https://api.tavily.com/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + apiKey,
+      },
+      body: JSON.stringify({
+        query: query + " Niger actualités sources fiables",
+        search_depth: "advanced",
+        max_results: 8,
+        topic: "news",
+        include_answer: false,
+        include_raw_content: false,
+      }),
+    });
+
+    const responseText = await response.text();
+
+    if (!response.ok) {
+      console.error(
+        "TAVILY HTTP ERROR:",
+        response.status,
+        responseText.slice(0, 500),
+      );
+      return "La recherche Internet a échoué. Ne présentez pas les informations actuelles comme vérifiées.";
+    }
+
+    const data = JSON.parse(responseText) as {
+      results?: Array<{
+        title?: string;
+        url?: string;
+        content?: string;
+        published_date?: string;
+      }>;
+    };
+
+    const results = (data.results ?? []).filter(
+      (item) => item.title && item.url && item.content,
+    );
+
+    console.log("TAVILY : nombre de résultats :", results.length);
+
+    if (results.length === 0) {
+      return "Aucun résultat Internet exploitable trouvé. Signalez que l'information actuelle n'a pas été vérifiée.";
+    }
+
+    return [
+      "RÉSULTATS DE RECHERCHE INTERNET TAVILY :",
+      "Exploitez les résultats pour répondre directement à la question.",
+      "Présentez les liens directs et les dates réellement fournies.",
+      "Ne fabriquez jamais de faits, de liens ou de dates.",
+      ...results.map((item, index) =>
+        [
+          "[" + (index + 1) + "] " + item.title,
+          "URL : " + item.url,
+          "Date de publication : " + (item.published_date ?? "Non indiquée"),
+          "Extrait : " + item.content!.slice(0, 1500),
+        ].join("\n"),
+      ),
+    ].join("\n\n");
+  } catch (error) {
+    console.error("TAVILY EXCEPTION :", error);
+    return "La recherche Internet est temporairement indisponible.";
+  }
+}
+  message: string,
+  apiKey?: string,
+): Promise<string | null> {
+  if (!CURRENT_INFO_PATTERN.test(message)) return null;
+
+  if (!apiKey) {
     return "La recherche Internet n'est pas configurée. Ne prétendez pas avoir vérifié les informations actuelles.";
   }
 
