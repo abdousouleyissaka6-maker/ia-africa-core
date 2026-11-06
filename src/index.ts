@@ -187,6 +187,80 @@ const CURRENT_INFO_PATTERN =
   /\b(actuel(?:le|s)?|aujourd'hui|aujourd’hui|maintenant|en ce moment|dernier(?:e|s)?|récent(?:e|s)?|actualités?|news|today|current|latest|recent|président|ministre|gouvernement)\b/i;
 
 async function getWebSearchContext(
+  message: string,
+  apiKey?: string,
+): Promise<string | null> {
+  if (!CURRENT_INFO_PATTERN.test(message)) return null;
+
+  if (!apiKey) {
+    console.error("TAVILY : clé API absente.");
+    return "La recherche Internet n'est pas configurée.";
+  }
+
+  const query = message
+    .replace(/donne[zr]?\s+(?:moi\s+)?(?:trois|3|cinq|5)\s+sources[^.?!]*/gi, "")
+    .replace(/avec leurs liens directs/gi, "")
+    .replace(/et leurs dates de publication/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  try {
+    const response = await fetch("https://api.tavily.com/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + apiKey,
+      },
+      body: JSON.stringify({
+        query: query + " Niger actualités sources fiables",
+        search_depth: "advanced",
+        max_results: 8,
+        topic: "news",
+        include_answer: false,
+        include_raw_content: false,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("TAVILY HTTP ERROR:", response.status);
+      return "La recherche Internet a échoué.";
+    }
+
+    const data = await response.json() as {
+      results?: Array<{
+        title?: string;
+        url?: string;
+        content?: string;
+        published_date?: string;
+      }>;
+    };
+
+    const results = (data.results ?? []).filter(
+      (item) => item.title && item.url && item.content,
+    );
+
+    if (results.length === 0) {
+      return "Aucun résultat Internet exploitable trouvé.";
+    }
+
+    return [
+      "RÉSULTATS DE RECHERCHE INTERNET TAVILY :",
+      "Utilisez les résultats pour répondre directement.",
+      "Ne fabriquez jamais de liens ou de dates.",
+      ...results.map((item, index) =>
+        [
+          "[" + (index + 1) + "] " + item.title,
+          "URL : " + item.url,
+          "Date : " + (item.published_date ?? "Non indiquée"),
+          "Extrait : " + item.content!.slice(0, 1500),
+        ].join("\n"),
+      ),
+    ].join("\n\n");
+  } catch (error) {
+    console.error("TAVILY EXCEPTION :", error);
+    return "La recherche Internet est temporairement indisponible.";
+  }
+}
 
           
 async function handleChat(
