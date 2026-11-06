@@ -262,7 +262,7 @@ async function getWebSearchContext(
   }
   }
           
-}async function handleChat(
+async function handleChat(
   request: Request,
   env: Env,
 ): Promise<Response> {
