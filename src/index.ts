@@ -14,9 +14,10 @@ export interface Env {
   WHATSAPP_ACCESS_TOKEN?: string;
   WHATSAPP_PHONE_NUMBER_ID?: string;
   WHATSAPP_VERIFY_TOKEN?: string;
- RUNWAY_API_KEY?: string
-OPENAI_API_KEY?: string;
-TAVILY_API_KEY?: string;
+  RUNWAY_API_KEY?: string;
+  OPENAI_API_KEY?: string;
+  TAVILY_API_KEY?: string;
+}
 const NASA_POWER_URL =
   "https://power.larc.nasa.gov/api/temporal/daily/point";
 
