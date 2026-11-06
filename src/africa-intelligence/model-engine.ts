@@ -1,9 +1,7 @@
+
 /**
  * IA AFRICA CORE — Model Engine
  * Moteur central d'exécution des modèles IA.
- *
- * Flux :
- * Registry → Health → Selector → Priority → Fallback → Exécution
  */
 
 import {
@@ -12,18 +10,9 @@ import {
 } from "./model-registry";
 
 import { selectModel } from "./model-selector";
-
-import {
-  getFallbackModels,
-} from "./model-fallback";
-
-import {
-  getHealthyModels,
-} from "./model-health";
-
-import {
-  rankModels,
-} from "./model-priority";
+import { getFallbackModels } from "./model-fallback";
+import { getHealthyModels } from "./model-health";
+import { rankModels } from "./model-priority";
 
 export interface ModelMessage {
   role: "system" | "user" | "assistant";
@@ -40,6 +29,8 @@ export interface ModelExecutionResult {
   model: string;
   provider: string;
   response: unknown;
+  fallbackUsed: boolean;
+  attemptedModels: string[];
 }
 
 export interface ModelRunner {
@@ -52,86 +43,82 @@ export interface ModelRunner {
   ): Promise<unknown>;
 }
 
-/**
- * Exécute le meilleur modèle disponible.
- *
- * IA AFRICA CORE :
- * 1. Vérifie les modèles disponibles.
- * 2. Vérifie leur état.
- * 3. Sélectionne le modèle adapté.
- * 4. Classe les modèles par priorité.
- * 5. Utilise automatiquement un modèle de secours
- *    si le modèle principal échoue.
- */
 export async function runModel(
-runner: ModelRunner,
-request: ModelRequest,
+  runner: ModelRunner,
+  request: ModelRequest,
 ): Promise<ModelExecutionResult> {
-const availableModels = getAvailableModels();
+  const availableModels = getAvailableModels();
 
-if (availableModels.length === 0) {
-throw new Error("Aucun modèle IA disponible.");
-}
+  if (availableModels.length === 0) {
+    throw new Error("Aucun modèle IA disponible.");
+  }
 
-const healthyModels = getHealthyModels();
+  const healthyModels = getHealthyModels();
 
-if (healthyModels.length === 0) {
-throw new Error("Aucun modèle IA opérationnel.");
-}
+  if (healthyModels.length === 0) {
+    throw new Error("Aucun modèle IA opérationnel.");
+  }
 
-const healthyIds = new Set(
-healthyModels.map((model) => model.id),
-);
+  const healthyIds = new Set(
+    healthyModels.map((model) => model.id),
+  );
 
-const selected = selectModel(request.domain);
-const rankedModels = rankModels(request.domain);
-const fallbackModels = getFallbackModels(selected.id);
+  const selected = selectModel(request.domain);
+  const rankedModels = rankModels(request.domain);
+  const fallbackModels = getFallbackModels(selected.id);
 
-const orderedModels: ModelDefinition[] = [
-...(healthyIds.has(selected.id) ? [selected] : []),
-...rankedModels.filter(
-(model) => model.enabled && healthyIds.has(model.id),
-),
-...fallbackModels.filter(
-(model) => model.enabled && healthyIds.has(model.id),
-),
-];
+  const orderedModels: ModelDefinition[] = [
+    ...(healthyIds.has(selected.id) ? [selected] : []),
+    ...rankedModels.filter(
+      (model) => model.enabled && healthyIds.has(model.id),
+    ),
+    ...fallbackModels.filter(
+      (model) => model.enabled && healthyIds.has(model.id),
+    ),
+  ];
 
-const uniqueModels = orderedModels.filter(
-(model, index, array) =>
-array.findIndex((item) => item.id === model.id) === index,
-);
+  const uniqueModels = orderedModels.filter(
+    (model, index, array) =>
+      array.findIndex((item) => item.id === model.id) === index,
+  );
 
-if (uniqueModels.length === 0) {
-throw new Error("Aucun modèle IA opérationnel disponible pour cette demande.");
-}
+  if (uniqueModels.length === 0) {
+    throw new Error(
+      "Aucun modèle IA opérationnel disponible pour cette demande.",
+    );
+  }
 
-const errors: string[] = [];
+  const errors: string[] = [];
+  const attemptedModels: string[] = [];
 
-for (const model of uniqueModels) {
-try {
-const response = await runner.run(model.name, {
-messages: request.messages,
-stream: request.stream ?? false,
-});
+  for (const model of uniqueModels) {
+    attemptedModels.push(model.name);
 
-  return {
-    model: model.name,
-    provider: model.provider,
-    response,
-  };
-} catch (error) {
-  errors.push(
-    `${model.name}: ${
-      error instanceof Error ? error.message : String(error)
-    }`,
+    try {
+      const response = await runner.run(model.name, {
+        messages: request.messages,
+        stream: request.stream ?? false,
+      });
+
+      return {
+        model: model.name,
+        provider: model.provider,
+        response,
+        fallbackUsed: model.id !== selected.id,
+        attemptedModels,
+      };
+    } catch (error) {
+      errors.push(
+        `${model.name}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  }
+
+  throw new Error(
+    `Tous les modèles IA opérationnels ont échoué. ${errors.join(" | ")}`,
   );
 }
 
-}
-
-throw new Error(
-    `Tous les modèles IA opérationnels ont échoué. ${errors.join(" | ")}`,
-);
-}
   
