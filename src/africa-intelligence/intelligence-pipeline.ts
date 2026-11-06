@@ -53,7 +53,7 @@ export async function runAfricaCore(
     stream: false,
   });
 
-  const answer = extractAnswer(result);
+  const answer = extractAnswer(result.response);
 
   if (!answer) {
     throw new Error(
@@ -72,6 +72,10 @@ export async function runAfricaCore(
     metadata: {
       service: selected.name ?? "general",
       core: "IA AFRICA CORE",
+      model: result.model,
+      provider: result.provider,
+      fallbackUsed: result.fallbackUsed,
+      attemptedModels: result.attemptedModels,
     },
   };
 }
@@ -93,13 +97,13 @@ function extractAnswer(result: unknown): string {
       : undefined;
 
   const payload =
-  data.response && typeof data.response === "object"
-    ? (data.response as Record<string, unknown>)
-    : data;
+    data.response && typeof data.response === "object"
+      ? (data.response as Record<string, unknown>)
+      : data;
 
-const choices = Array.isArray(payload.choices)
-  ? payload.choices
-  : [];
+  const choices = Array.isArray(payload.choices)
+    ? payload.choices
+    : [];
 
   const firstChoice =
     choices[0] && typeof choices[0] === "object"
@@ -155,6 +159,7 @@ function calculateConfidence(
   }
 
   return 0.7;
-         }
+}
+
 
   
