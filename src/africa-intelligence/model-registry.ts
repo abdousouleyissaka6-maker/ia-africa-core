@@ -33,6 +33,14 @@ const ALL_CAPABILITIES = [
 
 export const MODEL_REGISTRY: ModelDefinition[] = [
   {
+    id: "openai-gpt-5.4",
+    provider: "openai",
+    name: "gpt-5.4",
+    capabilities: ALL_CAPABILITIES,
+    enabled: true,
+    priority: 130,
+  },
+  {
     id: "openai-gpt-5.4-mini",
     provider: "openai",
     name: "gpt-5.4-mini",
@@ -53,4 +61,5 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
 export function getAvailableModels(): ModelDefinition[] {
   return MODEL_REGISTRY.filter((model) => model.enabled);
 }
+
 
