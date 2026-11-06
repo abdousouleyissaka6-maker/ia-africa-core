@@ -337,7 +337,11 @@ async function getWebSearchContext(
   try {
     const satelliteContext = await getSatelliteContext(content);
     if (satelliteContext) content += "\n\n" + satelliteContext;
-
+const webContext = await getWebSearchContext(
+  content,
+  env.TAVILY_API_KEY
+);
+if (webContext) content += "\n\n" + webContext;
     const intelligenceRequest: IntelligenceRequest = {
       type:
         input.type === "voice" ||
