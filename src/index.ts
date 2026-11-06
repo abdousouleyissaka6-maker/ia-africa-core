@@ -198,9 +198,11 @@ async function getWebSearchContext(
   try {
     const response = await fetch("https://api.tavily.com/search", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        api_key: apiKey,
+      headers: {
+  "Content-Type": "application/json",
+  "Authorization": "Bearer " + apiKey,
+},
+body: JSON.stringify({
         query: message.slice(0, 400),
         search_depth: "basic",
         max_results: 5,
