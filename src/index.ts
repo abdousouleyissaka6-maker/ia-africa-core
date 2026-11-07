@@ -352,6 +352,23 @@ async function handleChat(
     
 const originalQuestion = content;
 
+const userId =
+  typeof input.userId === "string" &&
+  /^[a-zA-Z0-9_-]{8,100}$/.test(input.userId)
+    ? input.userId
+    : undefined;
+
+if (userId) {
+  const previousMemory = await readUserMemory(env, userId);
+
+  if (previousMemory) {
+    content +=
+      "\n\nCONTEXTE DES ÉCHANGES PRÉCÉDENTS :\n" +
+      previousMemory +
+      "\n\nUtilise ce contexte uniquement s'il est pertinent pour répondre.";
+  }
+}
+
 const satelliteContext = await getSatelliteContext(originalQuestion);
 if (satelliteContext) {
   content += "\n\n" + satelliteContext;
