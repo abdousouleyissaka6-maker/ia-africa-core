@@ -402,7 +402,16 @@ if (webContext) {
     const runner = createCloudflareModelRunner(env.AI, env.OPENAI_API_KEY);
     const result = await runAfricaCore(intelligenceRequest, runner);
 
-    return Response.json({ success: true, ...result });
+if (userId && result.answer) {
+  await saveUserMemory(
+    env,
+    userId,
+    originalQuestion,
+    result.answer,
+  );
+}
+
+return Response.json({ success: true, ...result });
   } catch (error) {
     return Response.json(
       {
