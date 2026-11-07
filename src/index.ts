@@ -212,7 +212,7 @@ async function getWebSearchContext(
         "Authorization": "Bearer " + apiKey,
       },
       body: JSON.stringify({
-        query: query + " Niger actualités sources fiables",
+        query,
         search_depth: "advanced",
         max_results: 8,
         topic: "news",
