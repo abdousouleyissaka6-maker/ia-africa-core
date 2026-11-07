@@ -193,7 +193,7 @@ async function getWebSearchContext(
   if (!CURRENT_INFO_PATTERN.test(message)) return null;
 
   if (!apiKey) {
-    console.error("TAVILY : clé API absente.");
+    console.error("TAVILY ERREUR : clé API absente.");
     return "La recherche Internet n'est pas configurée.";
   }
 
@@ -222,8 +222,12 @@ async function getWebSearchContext(
     });
 
     if (!response.ok) {
-      console.error("TAVILY HTTP ERROR:", response.status);
-      return "La recherche Internet a échoué.";
+      const errorDetails = await response.text();
+      console.error("TAVILY HTTP ERROR :", {
+        status: response.status,
+        details: errorDetails.slice(0, 1500),
+      });
+      return "La recherche Internet a échoué. Code HTTP Tavily : " + response.status;
     }
 
     const data = await response.json() as {
@@ -239,14 +243,23 @@ async function getWebSearchContext(
       (item) => item.title && item.url && item.content,
     );
 
+    console.log("TAVILY RECHERCHE :", {
+      query,
+      resultCount: results.length,
+      titles: results.map((item) => item.title),
+    });
+
     if (results.length === 0) {
+      console.error("TAVILY : aucun résultat exploitable.");
       return "Aucun résultat Internet exploitable trouvé.";
     }
 
     return [
       "RÉSULTATS DE RECHERCHE INTERNET TAVILY :",
-      "Utilisez les résultats pour répondre directement.",
-      "Ne fabriquez jamais de liens ou de dates.",
+      "Répondez directement à la question avec ces résultats.",
+      "Privilégiez les sources officielles et les médias fiables.",
+      "Vérifiez la pertinence de chaque source.",
+      "Ne fabriquez jamais de titres, dates ou liens.",
       ...results.map((item, index) =>
         [
           "[" + (index + 1) + "] " + item.title,
