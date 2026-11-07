@@ -6,7 +6,6 @@ import {
   type CloudflareAI,
 } from "./africa-intelligence/index";
 
-
 export interface Env {
   AI: CloudflareAI;
   ASSETS: {
@@ -23,7 +22,6 @@ export interface Env {
   OPENAI_API_KEY?: string;
   TAVILY_API_KEY?: string;
 }
-
 
 const NASA_POWER_URL =
   "https://power.larc.nasa.gov/api/temporal/daily/point";
@@ -187,9 +185,6 @@ async function getSatelliteContext(
   }
 }
 
-
-
-
 const CURRENT_INFO_PATTERN =
   /\b(actuel(?:le|s)?|aujourd'hui|aujourd’hui|maintenant|en ce moment|dernier(?:e|s)?|récent(?:e|s)?|actualités?|news|today|current|latest|recent|président|ministre|gouvernement)\b/i;
 
@@ -282,8 +277,14 @@ async function getWebSearchContext(
   }
 }
 
-   function getMemoryKey(userId: string): string {
-  return "user-memory:" + userId;
+/* =========================================
+   MÉMOIRE UTILISATEUR - VERSION 2
+   Les anciennes conversations ne sont plus relues.
+   Les réponses générées par l'IA ne sont plus stockées.
+========================================= */
+
+function getMemoryKey(userId: string): string {
+  return "user-memory-v2:" + userId;
 }
 
 async function readUserMemory(
@@ -302,19 +303,31 @@ async function saveUserMemory(
   env: Env,
   userId: string,
   question: string,
-  answer: string,
 ): Promise<{ saved: boolean; error?: string }> {
   try {
     if (!env.MEMORY) {
       throw new Error("Binding MEMORY absent dans Cloudflare.");
     }
 
+    const cleanQuestion = question.trim();
+
+    if (
+      !cleanQuestion ||
+      /^[a-zA-Z0-9_-]{8,100}$/.test(cleanQuestion) ||
+      /mot de passe|password|api[_ -]?key|token|code de mémoire|code secret/i.test(cleanQuestion)
+    ) {
+      return {
+        saved: false,
+        error: "Message ignoré pour protéger les informations sensibles.",
+      };
+    }
+
     const key = getMemoryKey(userId);
     const previous = await env.MEMORY.get(key);
 
     const entry =
-      "\n\nUtilisateur : " + question.slice(0, 1000) +
-      "\nIA AFRICA CORE : " + answer.slice(0, 2000);
+      "\n\nMessage envoyé par l'utilisateur : " +
+      cleanQuestion.slice(0, 1000);
 
     const updated = (previous ?? "") + entry;
 
@@ -326,7 +339,7 @@ async function saveUserMemory(
       throw new Error("La vérification après écriture a échoué.");
     }
 
-    console.log("MÉMOIRE KV ENREGISTRÉE :", {
+    console.log("NOUVELLE MÉMOIRE UTILISATEUR ENREGISTRÉE :", {
       key,
       characters: verification.length,
     });
@@ -342,7 +355,6 @@ async function saveUserMemory(
   }
 }
 
- 
 async function handleChat(
   request: Request,
   env: Env,
@@ -370,40 +382,39 @@ async function handleChat(
       : String(originalContent);
 
   try {
-    
-const originalQuestion = content;
+    const originalQuestion = content;
 
-const userId =
-  typeof input.userId === "string" &&
-  /^[a-zA-Z0-9_-]{8,100}$/.test(input.userId)
-    ? input.userId
-    : undefined;
+    const userId =
+      typeof input.userId === "string" &&
+      /^[a-zA-Z0-9_-]{8,100}$/.test(input.userId)
+        ? input.userId
+        : undefined;
 
-if (userId) {
-  const previousMemory = await readUserMemory(env, userId);
+    if (userId) {
+      const previousMemory = await readUserMemory(env, userId);
 
-  if (previousMemory) {
-    content +=
-      "\n\nCONTEXTE DES ÉCHANGES PRÉCÉDENTS :\n" +
-      previousMemory +
-      "\n\nUtilise ce contexte uniquement s'il est pertinent pour répondre.";
-  }
-}
+      if (previousMemory) {
+        content +=
+          "\n\nHISTORIQUE DES MESSAGES DE L'UTILISATEUR :\n" +
+          previousMemory +
+          "\n\nIMPORTANT : cet historique contient uniquement des messages envoyés par l'utilisateur. Ce ne sont pas automatiquement des faits vérifiés. Ne présente jamais un ancien code, identifiant ou secret comme actuel. N'invente aucun souvenir.";
+      }
+    }
 
-const satelliteContext = await getSatelliteContext(originalQuestion);
-if (satelliteContext) {
-  content += "\n\n" + satelliteContext;
-}
+    const satelliteContext = await getSatelliteContext(originalQuestion);
+    if (satelliteContext) {
+      content += "\n\n" + satelliteContext;
+    }
 
-const webContext = await getWebSearchContext(
-  originalQuestion,
-  env.TAVILY_API_KEY
-);
+    const webContext = await getWebSearchContext(
+      originalQuestion,
+      env.TAVILY_API_KEY
+    );
 
-if (webContext) {
-  content += "\n\n" + webContext;
-}
-    
+    if (webContext) {
+      content += "\n\n" + webContext;
+    }
+
     const intelligenceRequest: IntelligenceRequest = {
       type:
         input.type === "voice" ||
@@ -423,36 +434,33 @@ if (webContext) {
     const runner = createCloudflareModelRunner(env.AI, env.OPENAI_API_KEY);
     const result = await runAfricaCore(intelligenceRequest, runner);
 
- 
-let memoryStatus = {
-  bindingConfigured: !!env.MEMORY,
-  userIdReceived: !!userId,
-  saved: false,
-  error: undefined as string | undefined,
-};
+    let memoryStatus = {
+      bindingConfigured: !!env.MEMORY,
+      userIdReceived: !!userId,
+      saved: false,
+      error: undefined as string | undefined,
+    };
 
-if (userId && result.answer) {
-  const memoryResult = await saveUserMemory(
-    env,
-    userId,
-    originalQuestion,
-    result.answer,
-  );
+    if (userId && result.answer) {
+      const memoryResult = await saveUserMemory(
+        env,
+        userId,
+        originalQuestion,
+      );
 
-  memoryStatus = {
-    bindingConfigured: !!env.MEMORY,
-    userIdReceived: true,
-    saved: memoryResult.saved,
-    error: memoryResult.error,
-  };
-}
+      memoryStatus = {
+        bindingConfigured: !!env.MEMORY,
+        userIdReceived: true,
+        saved: memoryResult.saved,
+        error: memoryResult.error,
+      };
+    }
 
-return Response.json({
-  success: true,
-  ...result,
-  memoryStatus,
-});
-    
+    return Response.json({
+      success: true,
+      ...result,
+      memoryStatus,
+    });
   } catch (error) {
     return Response.json(
       {
@@ -524,7 +532,7 @@ async function handleWhatsAppWebhook(
       }
     }
   }
-    
+
   for (const entry of payload?.entry ?? []) {
     for (const change of entry?.changes ?? []) {
       for (const message of change?.value?.messages ?? []) {
@@ -595,25 +603,23 @@ async function handleWhatsAppWebhook(
             },
           );
 
-          
-if (!sendResponse.ok) {
-  const sendError = await sendResponse.text();
+          if (!sendResponse.ok) {
+            const sendError = await sendResponse.text();
 
-  console.error(
-    "Erreur d'envoi WhatsApp (HTTP " +
-      sendResponse.status +
-      "):",
-    sendError,
-  );
-} else {
-  const sendData = await sendResponse.json();
+            console.error(
+              "Erreur d'envoi WhatsApp (HTTP " +
+                sendResponse.status +
+                "):",
+              sendError,
+            );
+          } else {
+            const sendData = await sendResponse.json();
 
-  console.log("Réponse WhatsApp envoyée.", {
-    recipient: message.from,
-    messageId: sendData?.messages?.[0]?.id ?? null,
-  });
-}
-          
+            console.log("Réponse WhatsApp envoyée.", {
+              recipient: message.from,
+              messageId: sendData?.messages?.[0]?.id ?? null,
+            });
+          }
         } catch (error) {
           console.error("Erreur de réponse WhatsApp:", error);
         }
@@ -714,101 +720,6 @@ async function handleRunwayVideo(
     );
   }
 }
+
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
-if (url.pathname === "/api/video") {
-  return handleRunwayVideo(request, env);
-}
-    if (url.pathname === "/webhook") {
-      return handleWhatsAppWebhook(request, env);
-    }
-
-    if (
-      request.method === "GET" &&
-      (url.pathname === "/" || url.pathname === "/index.html")
-    ) {
-      const assetUrl = new URL("/index.html", url.origin);
-      const assetResponse = await env.ASSETS.fetch(
-        new Request(assetUrl.toString(), request)
-      );
-
-      if (assetResponse.ok) {
-        return new Response(assetResponse.body, {
-          status: assetResponse.status,
-          headers: {
-            "Content-Type": "text/html; charset=utf-8",
-            "Cache-Control": "no-cache"
-          }
-        });
-      }
-
-      return new Response(
-        "Page d'accueil introuvable : vérifiez public/index.html.",
-        { status: 500 }
-      );
-    }
-
-    if (url.pathname === "/api/satellite") {
-      if (request.method !== "GET") {
-        return Response.json(
-          { error: "Utilisez la méthode GET." },
-          { status: 405 }
-        );
-      }
-
-      const latParam = url.searchParams.get("lat");
-      const lonParam = url.searchParams.get("lon");
-      const lat = Number(latParam);
-      const lon = Number(lonParam);
-
-      if (
-        latParam === null ||
-        lonParam === null ||
-        !Number.isFinite(lat) ||
-        !Number.isFinite(lon) ||
-        lat < -90 ||
-        lat > 90 ||
-        lon < -180 ||
-        lon > 180
-      ) {
-        return Response.json(
-          {
-            error: "Coordonnées invalides.",
-            exemple: "/api/satellite?lat=13.5116&lon=2.1254"
-          },
-          { status: 400 }
-        );
-      }
-
-      try {
-        const data = await getSatelliteData(lat, lon);
-        return Response.json(data, {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Cache-Control": "public, max-age=300"
-          }
-        });
-      } catch {
-        return Response.json(
-          { error: "Le service NASA POWER est temporairement inaccessible." },
-          { status: 502 }
-        );
-      }
-    }
-
-    if (request.method === "POST" && url.pathname === "/api/chat") {
-      return handleChat(request, env);
-    }
-
-    return Response.json(
-      {
-        error: "Route introuvable.",
-        routes: ["/", "/api/chat", "/api/satellite", "/webhook"]
-      },
-      { status: 404 }
-    );
-  }
-};
-
-      
+  async fetch(r
