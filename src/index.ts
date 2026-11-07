@@ -6,10 +6,19 @@ import {
   type CloudflareAI,
 } from "./africa-intelligence/index";
 
+
 export interface Env {
   AI: CloudflareAI;
   ASSETS: {
     fetch: (request: Request) => Promise<Response>;
+  };
+  MEMORY: {
+    get(key: string): Promise<string | null>;
+    put(
+      key: string,
+      value: string,
+      options?: { expirationTtl?: number }
+    ): Promise<void>;
   };
   WHATSAPP_ACCESS_TOKEN?: string;
   WHATSAPP_PHONE_NUMBER_ID?: string;
@@ -18,6 +27,7 @@ export interface Env {
   OPENAI_API_KEY?: string;
   TAVILY_API_KEY?: string;
 }
+
 const NASA_POWER_URL =
   "https://power.larc.nasa.gov/api/temporal/daily/point";
 
