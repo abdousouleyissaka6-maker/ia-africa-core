@@ -282,7 +282,46 @@ async function getWebSearchContext(
   }
 }
 
-          
+   function getMemoryKey(userId: string): string {
+  return "user-memory:" + userId;
+}
+
+async function readUserMemory(
+  env: Env,
+  userId: string,
+): Promise<string> {
+  try {
+    return (await env.MEMORY.get(getMemoryKey(userId))) ?? "";
+  } catch (error) {
+    console.error("Erreur lecture mémoire :", error);
+    return "";
+  }
+}
+
+async function saveUserMemory(
+  env: Env,
+  userId: string,
+  question: string,
+  answer: string,
+): Promise<void> {
+  try {
+    const key = getMemoryKey(userId);
+    const previous = await env.MEMORY.get(key);
+
+    const entry =
+      "\n\nUtilisateur : " + question.slice(0, 1000) +
+      "\nIA AFRICA CORE : " + answer.slice(0, 2000);
+
+    const updated = (previous ?? "") + entry;
+
+    await env.MEMORY.put(
+      key,
+      updated.slice(-6000),
+    );
+  } catch (error) {
+    console.error("Erreur sauvegarde mémoire :", error);
+  }
+}       
 async function handleChat(
   request: Request,
   env: Env,
