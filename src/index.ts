@@ -207,18 +207,29 @@ async function getWebSearchContext(
     .trim();
 
   try {
+        const newsQuery =
+      /actualités?|news|journal|breaking|dernières nouvelles|information récente/i.test(
+        message,
+      );
+
+    console.log("TAVILY APPEL :", {
+      keyConfigured: Boolean(apiKey),
+      query,
+      topic: newsQuery ? "news" : "general",
+    });
+
     const response = await fetch("https://api.tavily.com/search", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + apiKey,
       },
       body: JSON.stringify({
+        api_key: apiKey,
         query,
         search_depth: "advanced",
         max_results: 8,
-        topic: "news",
-        include_answer: false,
+        topic: newsQuery ? "news" : "general",
+        include_answer: true,
         include_raw_content: false,
       }),
     });
