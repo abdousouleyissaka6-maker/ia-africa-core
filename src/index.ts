@@ -342,13 +342,7 @@ async function saveUserMemory(
   }
 }
 
-): Promise<void> {
-  try {
-    const key = getMemoryKey(userId);
-    const previous = await env.MEMORY.get(key);
-
-    const entry =
-      "\n\   
+ 
 async function handleChat(
   request: Request,
   env: Env,
