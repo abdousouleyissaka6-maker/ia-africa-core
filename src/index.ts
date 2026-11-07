@@ -192,39 +192,47 @@ async function getWebSearchContext(
   message: string,
   apiKey?: string,
 ): Promise<string | null> {
-  if (!CURRENT_INFO_PATTERN.test(message)) return null;
+  const key = apiKey?.trim();
 
-  if (!apiKey) {
-    console.error("TAVILY ERREUR : clé API absente.");
-    return "La recherche Internet n'est pas configurée.";
+  if (!CURRENT_INFO_PATTERN.test(message)) {
+    return null;
+  }
+
+  if (!key) {
+    console.error("TAVILY : clé API absente de l'environnement Worker.");
+    return "La recherche Internet n'est pas configurée : la clé Tavily est absente du Worker.";
   }
 
   const query = message
-    .replace(/donne[zr]?\s+(?:moi\s+)?(?:trois|3|cinq|5)\s+sources[^.?!]*/gi, "")
+    .replace(
+      /donne[zr]?\s+(?:moi\s+)?(?:trois|3|cinq|5)\s+sources[^.?!]*/gi,
+      "",
+    )
     .replace(/avec leurs liens directs/gi, "")
     .replace(/et leurs dates de publication/gi, "")
     .replace(/\s+/g, " ")
-    .trim();
+    .trim()
+    .slice(0, 400);
+
+  const newsQuery =
+    /actualités?|news|journal|breaking|dernières nouvelles|information récente/i.test(
+      message,
+    );
 
   try {
-        const newsQuery =
-      /actualités?|news|journal|breaking|dernières nouvelles|information récente/i.test(
-        message,
-      );
-
-    console.log("TAVILY APPEL :", {
-      keyConfigured: Boolean(apiKey),
-      query,
+    console.log("TAVILY : recherche lancée", {
+      keyConfigured: true,
       topic: newsQuery ? "news" : "general",
+      query,
     });
 
     const response = await fetch("https://api.tavily.com/search", {
       method: "POST",
       headers: {
+        Authorization: `Bearer ${key}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        api_key: apiKey,
         query,
         search_depth: "advanced",
         max_results: 8,
@@ -235,15 +243,26 @@ async function getWebSearchContext(
     });
 
     if (!response.ok) {
-      const errorDetails = await response.text();
-      console.error("TAVILY HTTP ERROR :", {
+      const errorText = await response.text();
+
+      console.error("TAVILY HTTP ERROR", {
         status: response.status,
-        details: errorDetails.slice(0, 1500),
+        details: errorText.slice(0, 500),
       });
-      return "La recherche Internet a échoué. Code HTTP Tavily : " + response.status;
+
+      if (response.status === 401 || response.status === 403) {
+        return "La recherche Internet a échoué : la clé Tavily est refusée. Vérifiez la clé dans Cloudflare.";
+      }
+
+      if (response.status === 429) {
+        return "La recherche Internet est temporairement limitée : le quota Tavily est peut-être épuisé.";
+      }
+
+      return `La recherche Internet a échoué. Erreur Tavily HTTP ${response.status}.`;
     }
 
-    const data = await response.json() as {
+    const data = (await response.json()) as {
+      answer?: string;
       results?: Array<{
         title?: string;
         url?: string;
@@ -252,39 +271,49 @@ async function getWebSearchContext(
       }>;
     };
 
-    const results = (data.results ?? []).filter(
-      (item) => item.title && item.url && item.content,
-    );
-
-    console.log("TAVILY RECHERCHE :", {
-      query,
-      resultCount: results.length,
-      titles: results.map((item) => item.title),
-    });
+    const results = Array.isArray(data.results)
+      ? data.results
+          .filter(
+            (item) =>
+              typeof item.title === "string" &&
+              typeof item.url === "string" &&
+              /^https?:\/\//i.test(item.url) &&
+              typeof item.content === "string",
+          )
+          .slice(0, 8)
+      : [];
 
     if (results.length === 0) {
-      console.error("TAVILY : aucun résultat exploitable.");
-      return "Aucun résultat Internet exploitable trouvé.";
+      console.warn("TAVILY : aucun résultat exploitable.");
+      return "La recherche Internet a fonctionné, mais aucune source exploitable n'a été trouvée. Reformulez votre question.";
     }
 
+    const sources = results
+      .map((item, index) => {
+        const date = item.published_date || "Date non communiquée";
+        return `${index + 1}. ${item.title}
+Date : ${date}
+Lien : ${item.url}
+Informations : ${item.content!.slice(0, 1200)}`;
+      })
+      .join("\n\n");
+
+    console.log("TAVILY : recherche réussie", {
+      resultCount: results.length,
+    });
+
     return [
-      "RÉSULTATS DE RECHERCHE INTERNET TAVILY :",
-      "Répondez directement à la question avec ces résultats.",
-      "Privilégiez les sources officielles et les médias fiables.",
-      "Vérifiez la pertinence de chaque source.",
-      "Ne fabriquez jamais de titres, dates ou liens.",
-      ...results.map((item, index) =>
-        [
-          "[" + (index + 1) + "] " + item.title,
-          "URL : " + item.url,
-          "Date : " + (item.published_date ?? "Non indiquée"),
-          "Extrait : " + item.content!.slice(0, 1500),
-        ].join("\n"),
-      ),
-    ].join("\n\n");
+      "INFORMATIONS ISSUES D'UNE RECHERCHE INTERNET EN DIRECT :",
+      data.answer ? `Résumé Tavily : ${data.answer}` : "",
+      "SOURCES À CONSULTER :",
+      sources,
+      "CONSIGNES : utilise ces sources pour répondre. Distingue les faits vérifiés des incertitudes. N'invente jamais de date, de source ou de lien. Si les sources se contredisent, signale-le.",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
   } catch (error) {
-    console.error("TAVILY EXCEPTION :", error);
-    return "La recherche Internet est temporairement indisponible.";
+    console.error("TAVILY ERREUR :", error);
+    return "La recherche Internet a échoué à cause d'un problème de connexion au service Tavily.";
   }
 }
 
