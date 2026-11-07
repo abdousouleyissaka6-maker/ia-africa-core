@@ -14,6 +14,12 @@
     "binding": "ASSETS",
     "directory": "./public"
   },
+  "kv_namespaces": [
+    {
+      "binding": "MEMORY",
+      "id": "be9588493f6c47ac82c42c1350fa42f8"
+    }
+  ],
   "vars": {
     "WHATSAPP_VERIFY_TOKEN": "IAAfricaWebhook2026Niger",
     "WHATSAPP_PHONE_NUMBER_ID": "1294044390468463"
@@ -22,3 +28,4 @@
     "enabled": true
   }
 }
+
