@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ki<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -126,6 +126,19 @@ const welcome = document.getElementById("welcome");
 const statusText = document.getElementById("status");
 const language = document.getElementById("language");
 
+function getStableUserId() {
+  let id = localStorage.getItem("iaAfricaUserId");
+
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("iaAfricaUserId", id);
+  }
+
+  return id;
+}
+
+const userId = getStableUserId();
+ 
 function addMessage(text, role) {
  const div = document.createElement("div");
  div.className = "message " + role;
@@ -154,7 +167,7 @@ async function sendMessage() {
    headers: {"Content-Type":"application/json"},
    body: JSON.stringify({
     type: "text",
-    content: content,
+    content: content,userId: userId,
     language: language.value === "auto" ? undefined : language.value
    })
   });
