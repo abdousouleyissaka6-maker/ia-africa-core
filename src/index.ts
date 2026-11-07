@@ -722,4 +722,102 @@ async function handleRunwayVideo(
 }
 
 export default {
-  async fetch(r
+  
+async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/api/video") {
+      return handleRunwayVideo(request, env);
+    }
+
+    if (url.pathname === "/webhook") {
+      return handleWhatsAppWebhook(request, env);
+    }
+
+    if (
+      request.method === "GET" &&
+      (url.pathname === "/" || url.pathname === "/index.html")
+    ) {
+      const assetUrl = new URL("/index.html", url.origin);
+      const assetResponse = await env.ASSETS.fetch(
+        new Request(assetUrl.toString(), request),
+      );
+
+      if (assetResponse.ok) {
+        return new Response(assetResponse.body, {
+          status: assetResponse.status,
+          headers: {
+            "Content-Type": "text/html; charset=utf-8",
+            "Cache-Control": "no-cache",
+          },
+        });
+      }
+
+      return new Response(
+        "Page d'accueil introuvable : vérifiez public/index.html.",
+        { status: 500 },
+      );
+    }
+
+    if (url.pathname === "/api/satellite") {
+      if (request.method !== "GET") {
+        return Response.json(
+          { error: "Utilisez la méthode GET." },
+          { status: 405 },
+        );
+      }
+
+      const latParam = url.searchParams.get("lat");
+      const lonParam = url.searchParams.get("lon");
+      const lat = Number(latParam);
+      const lon = Number(lonParam);
+
+      if (
+        latParam === null ||
+        lonParam === null ||
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lon) ||
+        lat < -90 ||
+        lat > 90 ||
+        lon < -180 ||
+        lon > 180
+      ) {
+        return Response.json(
+          {
+            error: "Coordonnées invalides.",
+            exemple: "/api/satellite?lat=13.5116&lon=2.1254",
+          },
+          { status: 400 },
+        );
+      }
+
+      try {
+        const data = await getSatelliteData(lat, lon);
+        return Response.json(data, {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "public, max-age=300",
+          },
+        });
+      } catch {
+        return Response.json(
+          { error: "Le service NASA POWER est temporairement inaccessible." },
+          { status: 502 },
+        );
+      }
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/chat") {
+      return handleChat(request, env);
+    }
+
+    return Response.json(
+      {
+        error: "Route introuvable.",
+        routes: ["/", "/api/chat", "/api/satellite", "/api/video", "/webhook"],
+      },
+      { status: 404 },
+    );
+  },
+};
+
