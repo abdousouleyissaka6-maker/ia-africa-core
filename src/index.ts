@@ -14,11 +14,7 @@ export interface Env {
   };
   MEMORY: {
     get(key: string): Promise<string | null>;
-    put(
-      key: string,
-      value: string,
-      options?: { expirationTtl?: number }
-    ): Promise<void>;
+    put(key: string, value: string): Promise<void>;
   };
   WHATSAPP_ACCESS_TOKEN?: string;
   WHATSAPP_PHONE_NUMBER_ID?: string;
