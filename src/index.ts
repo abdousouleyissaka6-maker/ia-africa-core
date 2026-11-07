@@ -303,8 +303,12 @@ async function saveUserMemory(
   userId: string,
   question: string,
   answer: string,
-): Promise<void> {
+): Promise<{ saved: boolean; error?: string }> {
   try {
+    if (!env.MEMORY) {
+      throw new Error("Binding MEMORY absent dans Cloudflare.");
+    }
+
     const key = getMemoryKey(userId);
     const previous = await env.MEMORY.get(key);
 
@@ -314,14 +318,37 @@ async function saveUserMemory(
 
     const updated = (previous ?? "") + entry;
 
-    await env.MEMORY.put(
+    await env.MEMORY.put(key, updated.slice(-6000));
+
+    const verification = await env.MEMORY.get(key);
+
+    if (verification === null) {
+      throw new Error("La vérification après écriture a échoué.");
+    }
+
+    console.log("MÉMOIRE KV ENREGISTRÉE :", {
       key,
-      updated.slice(-6000),
-    );
+      characters: verification.length,
+    });
+
+    return { saved: true };
   } catch (error) {
-    console.error("Erreur sauvegarde mémoire :", error);
+    const message =
+      error instanceof Error ? error.message : "Erreur KV inconnue.";
+
+    console.error("ERREUR ENREGISTREMENT MÉMOIRE KV :", message);
+
+    return { saved: false, error: message };
   }
-}       
+}
+
+): Promise<void> {
+  try {
+    const key = getMemoryKey(userId);
+    const previous = await env.MEMORY.get(key);
+
+    const entry =
+      "\n\   
 async function handleChat(
   request: Request,
   env: Env,
@@ -402,16 +429,36 @@ if (webContext) {
     const runner = createCloudflareModelRunner(env.AI, env.OPENAI_API_KEY);
     const result = await runAfricaCore(intelligenceRequest, runner);
 
+ 
+let memoryStatus = {
+  bindingConfigured: !!env.MEMORY,
+  userIdReceived: !!userId,
+  saved: false,
+  error: undefined as string | undefined,
+};
+
 if (userId && result.answer) {
-  await saveUserMemory(
+  const memoryResult = await saveUserMemory(
     env,
     userId,
     originalQuestion,
     result.answer,
   );
+
+  memoryStatus = {
+    bindingConfigured: !!env.MEMORY,
+    userIdReceived: true,
+    saved: memoryResult.saved,
+    error: memoryResult.error,
+  };
 }
 
-return Response.json({ success: true, ...result });
+return Response.json({
+  success: true,
+  ...result,
+  memoryStatus,
+});
+    
   } catch (error) {
     return Response.json(
       {
