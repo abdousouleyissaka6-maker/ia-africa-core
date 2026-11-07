@@ -1,873 +1,210 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101827">
-  <title>IA Africa — Core & Studio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#212121">
+<title>IA AFRICA CORE</title>
 
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1120;
-      color: #f4f7ff;
-    }
-
-    header {
-      padding: 18px;
-      background: #111c30;
-      border-bottom: 1px solid #29364b;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo {
-      width: 45px;
-      height: 45px;
-      display: grid;
-      place-items: center;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #00b894, #2878ff);
-      font-weight: bold;
-      font-size: 20px;
-    }
-
-    h1 { font-size: 21px; margin: 0 0 5px; }
-    header p { margin: 0; color: #a9bad2; font-size: 13px; }
-
-    main {
-      max-width: 850px;
-      margin: auto;
-      padding: 18px;
-    }
-
-    .welcome {
-      padding: 22px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #142b42, #182044);
-      margin-bottom: 18px;
-    }
-
-    .welcome h2 { margin-top: 0; font-size: 23px; }
-    .welcome p { color: #c4d2e5; line-height: 1.6; }
-
-    .tabs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-
-    button, textarea, select { font: inherit; }
-
-    .tab {
-      background: #172338;
-      color: #dce7f7;
-      border: 1px solid #33445e;
-      border-radius: 12px;
-      padding: 13px 5px;
-      cursor: pointer;
-    }
-
-    .tab.active {
-      background: #087f70;
-      border-color: #12b99f;
-      color: white;
-    }
-
-    .panel {
-      background: #111c30;
-      border: 1px solid #29364b;
-      border-radius: 18px;
-      padding: 18px;
-    }
-
-    .panel h2 { margin-top: 0; font-size: 19px; }
-
-    #messages {
-      min-height: 210px;
-      max-height: 420px;
-      overflow-y: auto;
-      padding: 10px 0;
-    }
-
-    .message {
-      padding: 12px 14px;
-      border-radius: 13px;
-      margin: 10px 0;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-      line-height: 1.55;
-    }
-
-    .user {
-      background: #164b63;
-      margin-left: 12%;
-    }
-
-    .ai { background: #202d42; margin-right: 5%; }
-
-    textarea, select {
-      width: 100%;
-      padding: 13px;
-      border-radius: 12px;
-      border: 1px solid #3a4a63;
-      background: #0b1424;
-      color: white;
-      outline: none;
-    }
-
-    textarea { min-height: 95px; resize: vertical; }
-
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .controls button {
-      flex: 1;
-      padding: 13px;
-      border: 0;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    #send { background: #08a88c; color: white; }
-    #clear { background: #26344b; color: white; }
-    button:disabled { opacity: .55; cursor: wait; }
-
-    .studio-card {
-      background: #19263b;
-      border: 1px solid #33445e;
-      border-radius: 14px;
-      padding: 15px;
-      margin: 12px 0;
-    }
-
-    .studio-card p, .note {
-      color: #c1cee0;
-      line-height: 1.6;
-      font-size: 14px;
-    }
-
-    .status {
-      color: #72dfbd;
-      font-size: 13px;
-      margin-top: 12px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 25px 12px;
-      color: #8799b2;
-      font-size: 12px;
-    }
-
-    @media (min-width: 600px) {
-      .tabs { grid-template-columns: repeat(6, 1fr); }
-    }
-  </style>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#212121;color:#ececec;
+ font-family:Arial,sans-serif;min-height:100vh;
+ display:flex;flex-direction:column
+}
+header{
+ padding:16px 20px;border-bottom:1px solid #383838;
+ display:flex;align-items:center;gap:12px
+}
+.logo{
+ width:38px;height:38px;border-radius:50%;
+ background:#10a37f;display:grid;place-items:center;
+ font-weight:bold;color:white
+}
+header h1{font-size:18px;margin:0}
+header small{color:#aaa}
+main{
+ width:100%;max-width:850px;margin:auto;
+ flex:1;padding:25px 16px 130px
+}
+.welcome{text-align:center;margin:65px 0 35px}
+.welcome h2{font-size:27px}
+.welcome p{color:#aaa}
+#messages{display:flex;flex-direction:column;gap:22px}
+.message{
+ padding:15px 18px;border-radius:15px;
+ line-height:1.65;white-space:pre-wrap;
+ overflow-wrap:anywhere
+}
+.user{background:#303030;align-self:flex-end;max-width:85%}
+.assistant{align-self:stretch;background:#292929}
+.composer-area{
+ position:fixed;bottom:0;left:0;right:0;
+ background:linear-gradient(transparent,#212121 20%);
+ padding:18px 14px 12px
+}
+.composer{
+ max-width:850px;margin:auto;background:#303030;
+ border:1px solid #505050;border-radius:18px;
+ padding:12px;display:flex;gap:10px;align-items:flex-end
+}
+textarea{
+ flex:1;resize:none;min-height:48px;max-height:150px;
+ border:0;outline:0;background:transparent;color:white;
+ font-size:16px;padding:12px
+}
+select{
+ background:#303030;color:#ddd;border:1px solid #555;
+ border-radius:9px;padding:9px;max-width:125px
+}
+button{
+ background:#10a37f;color:white;border:0;
+ border-radius:12px;padding:12px 17px;
+ font-weight:bold;cursor:pointer
+}
+button:disabled{opacity:.5}
+.status{
+ text-align:center;color:#999;font-size:12px;
+ padding-top:9px
+}
+footer{
+ text-align:center;color:#888;font-size:12px;
+ padding:10px
+}
+@media(max-width:500px){
+ .welcome{margin-top:45px}
+ .composer{gap:6px;padding:8px}
+ select{max-width:100px;font-size:12px}
+ button{padding:12px}
+}
+</style>
 </head>
 
 <body>
-  <header>
-    <div class="brand">
-      <div class="logo">IA</div>
-      <div>
-        <h1>IA AFRICA</h1>
-        <p>Core + Studio — Une plateforme, plusieurs possibilités</p>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <section class="welcome">
-      <h2>Bienvenue dans IA Africa</h2>
-      <p>
-        Discutez, apprenez, travaillez et préparez vos projets.
-        Retrouvez les outils de conversation et les espaces de
-        création dans une seule interface.
-      </p>
-    </section>
-
-    <nav class="tabs" aria-label="Espaces IA Africa">
-      <button class="tab active" data-mode="chat">💬 Chat</button>
-      <button class="tab" data-mode="image">🖼️ Images</button>
-      <button class="tab" data-mode="video">🎬 Vidéos</button>
-      <button class="tab" data-mode="music">🎵 Musique</button>
-      <button class="tab" data-mode="voice">🎙️ Voix</button>
-      <button class="tab" data-mode="studio">✨ Studio</button>
-    </nav>
-
-    <section class="panel" id="chatPanel">
-      <h2>IA Africa Core</h2>
-      <p class="note">
-        Posez vos questions dans les domaines de l'éducation,
-        des sciences, de la technologie, du travail et de la vie
-        quotidienne.
-      </p>
-
-      <label for="language">Langue de réponse</label>
-      <select id="language">
-        <option value="auto">Même langue que ma question</option>
-        <option value="français">Français</option>
-        <option value="anglais">English</option>
-        <option value="haoussa">Haoussa</option>
-        <option value="zarma">Zarma / Songhaï</option>
-      </select>
-
-      <div id="messages" aria-live="polite">
-        <div class="message ai">
-          Bonjour ! Je suis IA Africa. Quelle est votre question ?
-        </div>
-      </div>
-
-      <label for="question">Votre message</label>
-      <textarea id="question"
-        placeholder="Écrivez votre question ici..."></textarea>
-
-      <div class="controls">
-  <button id="send">Envoyer ➤</button>
-  <button id="clear">Effacer</button>
-  <button id="voiceInput" type="button">🎙️ Parler</button>
-  <button id="speakAnswer" type="button">🔊 Lire la réponse</button>
-      </div>
-
-      <p class="status" id="status" role="status"></p>
-    </section>
-
-    <section class="panel" id="studioPanel" hidden>
-      <h2 id="studioTitle">IA Africa Studio</h2>
-      <p class="note" id="studioDescription">
-        Choisissez un espace pour préparer votre projet créatif.
-      </p>
-
-      <div class="studio-card">
-        <strong id="featureTitle">Création multimédia</strong>
-        <p id="featureDescription">
-          Préparez votre idée et connectez le moteur de génération
-          correspondant pour produire votre contenu.
-        </p>
-      </div>
-
-      <label for="project">Décrivez votre projet</label>
-      <textarea id="project"
-        placeholder="Décrivez ce que vous souhaitez créer..."></textarea>
-
-      <div class="controls">
-        <button id="prepare">Préparer mon projet</button>
-      </div>
-
-      <div id="projectResult" class="message ai" hidden></div>
-
-      <p class="note">
-        Cet espace est une interface de préparation.
-        La génération réelle d'images, de vidéos, de musique ou de
-        voix nécessite la connexion d'un service compatible.
-      </p>
-    </section>
-  </main>
-
-  <footer>
-    IA AFRICA CORE + IA AFRICA STUDIO
-  </footer>
-
-  <script>
-    const tabs = document.querySelectorAll(".tab");
-    const chatPanel = document.getElementById("chatPanel");
-    const studioPanel = document.getElementById("studioPanel");
-    const messages = document.getElementById("messages");
-    const question = document.getElementById("question");
-    const send = document.getElementById("send");
-    const clear = document.getElementById("clear");
-    const status = document.getElementById("status");
-const speakAnswer = document.getElementById("speakAnswer");
-
-    let currentMode = "chat";
-
-    const modes = {
-      image: {
-        title: "Création d'images",
-        description: "Préparez une description pour une image.",
-        feature: "Générateur d'images",
-        detail: "Décrivez le sujet, le style, les couleurs et le format souhaités."
-      },
-      video: {
-        title: "Création de vidéos",
-        description: "Préparez le concept de votre prochaine vidéo.",
-        feature: "Générateur de vidéos",
-        detail: "Décrivez les scènes, les personnages, la durée et le style."
-      },
-      music: {
-        title: "Création musicale",
-        description: "Préparez les paroles ou le concept de votre musique.",
-        feature: "Studio musical",
-        detail: "Indiquez le genre musical, la langue, le rythme et l'ambiance."
-      },
-      voice: {
-        title: "Création vocale",
-        description: "Préparez un texte à lire avec une voix de synthèse.",
-        feature: "Générateur de voix",
-        detail: "Écrivez le texte et précisez la langue et le style de voix."
-      },
-      studio: {
-        title: "IA Africa Studio",
-        description: "Préparez vos projets créatifs au même endroit.",
-        feature: "Espace de création",
-        detail: "Rédigez votre idée pour préparer les étapes de réalisation."
-      }
-    };
-
-    tabs.forEach(function(tab) {
-      tab.addEventListener("click", function() {
-        currentMode = tab.dataset.mode;
-
-        tabs.forEach(function(item) {
-          item.classList.toggle("active", item === tab);
-        });
-
-        const isChat = currentMode === "chat";
-        chatPanel.hidden = !isChat;
-        studioPanel.hidden = isChat;
-
-        if (!isChat) {
-          const mode = modes[currentMode];
-          document.getElementById("studioTitle").textContent = mode.title;
-          document.getElementById("studioDescription").textContent =
-            mode.description;
-          document.getElementById("featureTitle").textContent = mode.feature;
-          document.getElementById("featureDescription").textContent =
-            mode.detail;
-          document.getElementById("project").placeholder = mode.detail;
-          document.getElementById("projectResult").hidden = true;
-        }
-      });
-    });
-
-    function addMessage(text, role) {
-      const element = document.createElement("div");
-      element.className = "message " + role;
-      element.textContent = text;
-      messages.appendChild(element);
-      messages.scrollTop = messages.scrollHeight;
-      return element;
-    }
-
-    async function sendMessage() {
-      const content = question.value.trim();
-      if (!content || send.disabled) return;
-
-      addMessage(content, "user");
-      question.value = "";
-      send.disabled = true;
-      status.textContent = "IA Africa prépare sa réponse...";
-      const waiting = addMessage("Réponse en cours...", "ai");
-
-      try {
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type: "text",
-            content: content,
-            language: document.getElementById("language").value
-          })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || data.success === false) {
-          throw new Error(data.error || "Le serveur a refusé la demande.");
-        }
-
-        waiting.textContent =
-          data.answer || data.content || "Aucune réponse reçue.";
-        status.textContent = "Réponse reçue.";
-      } catch (error) {
-        waiting.textContent =
-          "Impossible d'obtenir une réponse. Vérifiez la connexion et le moteur IA du serveur. Détail : " +
-          (error.message || "erreur inconnue");
-        status.textContent = "La demande a échoué.";
-      } finally {
-        send.disabled = false;
-        question.focus();
-      }
-    }
-
-    // FONCTION 1 : DICTÉE VOCALE
-const voiceInput = document.getElementById("voiceInput");
-
-const SpeechRecognition =
-window.SpeechRecognition || window.webkitSpeechRecognition;
-
-if (voiceInput) {
-voiceInput.addEventListener("click", function () {
-if (!SpeechRecognition) {
-status.textContent =
-"Dictée vocale non prise en charge. Essayez Google Chrome.";
-return;
-}
-
-const recognition = new SpeechRecognition();
-recognition.continuous = false;
-recognition.interimResults = false;
-recognition.lang = "fr-FR";
-
-recognition.onstart = function () {
-  voiceInput.textContent = "🎙️ Écoute...";
-  status.textContent = "Parlez maintenant.";
-};
-
-recognition.onresult = function (event) {
-  question.value = event.results[0][0].transcript;
-  status.textContent = "Question dictée. Appuyez sur Envoyer.";
-};
-
-recognition.onerror = function (event) {
-  status.textContent =
-    event.error === "not-allowed"
-      ? "Autorisez le microphone dans les paramètres du navigateur."
-      : "Erreur du microphone. Réessayez.";
-};
-
-recognition.onend = function () {
-  voiceInput.textContent = "🎙️ Parler";
-};
-
-try {
-  recognition.start();
-} catch (error) {
-  voiceInput.textContent = "🎙️ Parler";
-  status.textContent = "Impossible de démarrer le microphone. Réessayez.";
-}
-
-});
-    }
-
-// FONCTION 2 : LECTURE VOCALE DE LA RÉPONSE
-speakAnswer.addEventListener("click", function () {
-  const answers = messages.querySelectorAll(".message.ai");
-  const lastAnswer = answers.length
-    ? answers[answers.length - 1].textContent.trim()
-    : "";
-
-  if (!lastAnswer) {
-    status.textContent = "Aucune réponse à lire.";
-    return;
-  }
-
-  if (!("speechSynthesis" in window)) {
-    status.textContent =
-      "Lecture vocale non prise en charge par ce navigateur.";
-    return;
-  }
-
-  window.speechSynthesis.cancel();
-
-  const utterance = new SpeechSynthesisUtterance(lastAnswer);
-  utterance.lang = "fr-FR";
-
-  utterance.onstart = function () {
-    status.textContent = "Lecture vocale en cours...";
-  };
-
-  utterance.onend = function () {
-    status.textContent = "Lecture terminée.";
-  };
-
-  utterance.onerror = function () {
-    status.textContent = "Erreur de lecture. Vérifiez le volume.";
-  };
-
-  window.speechSynthesis.speak(utterance);
-});send.addEventListener("click", sendMessage);
-
-    question.addEventListener("keydown", function(event) {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
-      }
-    });
-
-    clear.addEventListener("click", function() {
-      messages.replaceChildren();
-      addMessage("Conversation effacée. Posez votre question.", "ai");
-      status.textContent = "";
-    });
-
-    document.getElementById("prepare").addEventListener("click", async function() {
-const idea = document.getElementById("project").value.trim();
-const result = document.getElementById("projectResult");
-
-if (!idea) {
-result.textContent = "Décrivez d'abord votre projet.";
-result.hidden = false;
-return;
-}
-
-if (currentMode === "video") {
-result.textContent = "Demande envoyée à Runway. Génération vidéo en cours...";
-result.hidden = false;
-
-try {
-  const startResponse = await fetch("/api/video", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: idea })
-  });
-
-  const startData = await startResponse.json();
-
-  if (!startResponse.ok || !startData.id) {
-    const details = startData.details
-        ? JSON.stringify(startData.details)
-        : "";
-
-    throw new Error(
-        [startData.error || "Impossible de lancer la vidéo.", details]
-            .filter(Boolean)
-            .join(" — ")
-    );
-    }
-
-  const taskId = startData.id;
-  let taskData = null;
-
-  for (let attempt = 0; attempt < 40; attempt++) {
-    await new Promise(resolve => setTimeout(resolve, 5000));
-
-    const statusResponse = await fetch(
-      "/api/video?taskId=" + encodeURIComponent(taskId)
-    );
-
-    taskData = await statusResponse.json();
-
-    if (!statusResponse.ok) {
-      throw new Error(taskData.error || "Erreur de vérification.");
-    }
-
-    if (taskData.status === "SUCCEEDED") break;
-
-    if (taskData.status === "FAILED" || taskData.status === "CANCELED") {
-      throw new Error("Runway n'a pas terminé la vidéo.");
-    }
-
-    result.textContent = "Génération en cours : " + (taskData.status || "en attente");
-  }
-
-  if (!taskData || taskData.status !== "SUCCEEDED" ||
-      !Array.isArray(taskData.output) || !taskData.output[0]) {
-    throw new Error("Vidéo non prête. Réessayez plus tard.");
-  }
-
-  result.replaceChildren();
-
-  const message = document.createElement("p");
-  message.textContent = "Vidéo créée avec succès !";
-
-  const link = document.createElement("a");
-  link.href = taskData.output[0];
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
-  link.textContent = "Ouvrir ou télécharger la vidéo";
-
-  result.append(message, link);
-  result.hidden = false;
-  return;
-
-} catch (error) {
-  const errorMessage =
-  error instanceof Error ? error.message : "Veuillez réessayer.";
-
-result.replaceChildren();
-
-const errorTitle = document.createElement("p");
-errorTitle.textContent = "La vidéo n'a pas pu être créée.";
-
-const errorDetails = document.createElement("p");
-errorDetails.textContent = errorMessage;
-
-result.append(errorTitle, errorDetails);
-result.hidden = false;
-  result.hidden = false;
-  return;
-}
-
-}
-
-if (currentMode === "voice") {
-if ("speechSynthesis" in window) {
-window.speechSynthesis.cancel();
-const utterance = new SpeechSynthesisUtterance(idea);
-utterance.lang = "fr-FR";
-window.speechSynthesis.speak(utterance);
-result.textContent = "Lecture vocale lancée.";
-} else {
-result.textContent = "La lecture vocale n'est pas disponible sur ce navigateur.";
-}
-} else {
-result.textContent =
-"Projet préparé — espace : " + modes[currentMode].title +
-"\n\nVotre idée : " + idea +
-"\n\nLa prochaine étape consiste à connecter un moteur adapté à ce projet.";
-}
-
-result.hidden = false;
-});
-  </script>
-<!-- PORTEFEUILLE IA AFRICA -->
-<style>
-#af-wallet-button {
-  position: fixed;
-  right: 14px;
-  bottom: 18px;
-  z-index: 9999;
-  border: 0;
-  border-radius: 24px;
-  padding: 13px 18px;
-  background: #13a879;
-  color: white;
-  font-weight: bold;
-  box-shadow: 0 3px 12px #0005;
-}
-#af-wallet {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  background: #101820;
-  color: white;
-  padding: 22px;
-  overflow: auto;
-  font-family: Arial, sans-serif;
-}
-#af-wallet .wallet-card {
-  max-width: 440px;
-  margin: 25px auto;
-  background: #202c36;
-  padding: 22px;
-  border-radius: 18px;
-}
-#af-wallet select, #af-wallet input {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0 14px;
-  border-radius: 8px;
-  border: 1px solid #52616d;
-  background: #111b23;
-  color: white;
-}
-#af-wallet .wallet-action {
-  padding: 12px;
-  border: 0;
-  border-radius: 9px;
-  margin: 5px 3px 12px 0;
-  background: #13a879;
-  color: white;
-  font-weight: bold;
-}
-#af-wallet .wallet-close {
-  background: #56616a;
-}
-#af-wallet .wallet-note {
-  font-size: 13px;
-  color: #c4d0d8;
-  line-height: 1.5;
-}
-</style>
-
-<button id="af-wallet-button" onclick="document.getElementById('af-wallet').style.display='block'">
-  💰 Portefeuille
-</button>
-
-<div id="af-wallet">
-  <div class="wallet-card">
-    <h2>💰 Portefeuille IA Africa</h2>
-    <p>Solde de démonstration</p>
-
-    <label for="af-currency">Choisir la monnaie</label>
-    <select id="af-currency" onchange="afUpdateWallet()">
-      <option value="XOF">Franc CFA (FCFA)</option>
-      <option value="EUR">Euro (€)</option>
-      <option value="USD">Dollar américain ($)</option>
-    </select>
-
-    <h1 id="af-balance">0 FCFA</h1>
-    <p id="af-equivalent">Équivalents indicatifs : 0 € · 0 $</p>
-
-    <label for="af-amount">Montant</label>
-    <input id="af-amount" type="number" min="1" placeholder="Saisir un montant">
-
-    <button class="wallet-action" onclick="afDemoAction('Dépôt')">＋ Déposer</button>
-    <button class="wallet-action" onclick="afDemoAction('Retrait')">↗ Retirer</button>
-
-    <p class="wallet-note">
-      Version de démonstration : aucun paiement réel n'est effectué.
-      Le solde affiché n'est pas un compte bancaire. Les dépôts et
-      retraits seront activés après la connexion d'un service de paiement sécurisé.
-    </p>
-
-    <button class="wallet-action wallet-close"
-      onclick="document.getElementById('af-wallet').style.display='none'">
-      Fermer
-    </button>
-  </div>
+<header>
+ <div class="logo">IA</div>
+ <div>
+  <h1>IA AFRICA CORE</h1>
+  <small>Votre intelligence artificielle</small>
+ </div>
+</header>
+
+<main>
+ <section class="welcome" id="welcome">
+  <h2>Bonjour !</h2>
+  <p>Je suis IA AFRICA CORE. Comment puis-je vous aider aujourd'hui ?</p>
+ </section>
+
+ <section id="messages"></section>
+</main>
+
+<div class="composer-area">
+ <div class="composer">
+  <select id="language" aria-label="Langue de réponse">
+   <option value="auto">Automatique</option>
+   <option value="français">Français</option>
+   <option value="anglais">Anglais</option>
+   <option value="haoussa">Haoussa</option>
+   <option value="zarma">Zarma</option>
+  </select>
+
+  <textarea id="question" placeholder="Écrivez votre message..." rows="1"></textarea>
+
+  <button id="send" type="button">Envoyer</button>
+ </div>
+ <div class="status" id="status">IA AFRICA CORE est prête</div>
 </div>
 
-<script>
-function afUpdateWallet() {
-  const currency = document.getElementById('af-currency').value;
-  const balance = document.getElementById('af-balance');
-  const equivalent = document.getElementById('af-equivalent');
+<footer>IA AFRICA CORE · Créé par Abdou Souley Issaka</footer>
 
-  if (currency === 'XOF') {
-    balance.textContent = '0 FCFA';
-  } else if (currency === 'EUR') {
-    balance.textContent = '0 €';
+<script>
+const question = document.getElementById("question");
+const send = document.getElementById("send");
+const messages = document.getElementById("messages");
+const welcome = document.getElementById("welcome");
+const statusText = document.getElementById("status");
+const language = document.getElementById("language");
+
+function addMessage(text, role) {
+ const div = document.createElement("div");
+ div.className = "message " + role;
+ div.textContent = text;
+ messages.appendChild(div);
+ window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+ return div;
+}
+
+async function sendMessage() {
+ const content = question.value.trim();
+ if (!content || send.disabled) return;
+
+ welcome.style.display = "none";
+ addMessage(content, "user");
+ question.value = "";
+ question.style.height = "48px";
+ send.disabled = true;
+ statusText.textContent = "IA AFRICA CORE réfléchit...";
+
+ const reply = addMessage("Réponse en cours...", "assistant");
+
+ try {
+  const response = await fetch("/api/chat", {
+   method: "POST",
+   headers: {"Content-Type":"application/json"},
+   body: JSON.stringify({
+    type: "text",
+    content: content,
+    language: language.value === "auto" ? undefined : language.value
+   })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.success === false) {
+   throw new Error(data.error || "Une erreur est survenue.");
+  }
+
+  const answer =
+   data.answer ??
+   data.response ??
+   data.text ??
+   data.content ??
+   data.output ??
+   data.result;
+
+  if (typeof answer === "string") {
+   reply.textContent = answer;
+  } else if (answer !== undefined) {
+   reply.textContent = JSON.stringify(answer, null, 2);
   } else {
-    balance.textContent = '$0.00';
+   reply.textContent = JSON.stringify(data, null, 2);
   }
 
-  equivalent.textContent = 'Équivalents indicatifs : 0 € · 0 $';
+  statusText.textContent = "IA AFRICA CORE est prête";
+ } catch (error) {
+  reply.textContent = "Impossible d'obtenir une réponse : " + error.message;
+  statusText.textContent = "Erreur de connexion";
+ }
+
+ send.disabled = false;
+ question.focus();
+ window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
 }
 
-function afDemoAction(action) {
-  alert(action + ' : les paiements réels ne sont pas encore activés sur IA Africa.');
-}
-</script><!-- PORTEFEUILLE IA AFRICA -->
-<style>
-#af-wallet-button {
-  position: fixed;
-  right: 14px;
-  bottom: 18px;
-  z-index: 9999;
-  border: 0;
-  border-radius: 24px;
-  padding: 13px 18px;
-  background: #13a879;
-  color: white;
-  font-weight: bold;
-}
-#af-wallet {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  background: #101820;
-  color: white;
-  padding: 22px;
-  overflow: auto;
-  font-family: Arial, sans-serif;
-}
-#af-wallet .wallet-card {
-  max-width: 440px;
-  margin: 25px auto;
-  background: #202c36;
-  padding: 22px;
-  border-radius: 18px;
-}
-#af-wallet select, #af-wallet input {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0 14px;
-  border-radius: 8px;
-}
-#af-wallet .wallet-action {
-  padding: 12px;
-  border: 0;
-  border-radius: 9px;
-  margin: 5px 3px 12px 0;
-  background: #13a879;
-  color: white;
-  font-weight: bold;
-}
-</style>
+send.addEventListener("click", sendMessage);
 
-<button id="af-wallet-button" onclick="document.getElementById('af-wallet').style.display='block'">
-  💰 Portefeuille
-</button>
+question.addEventListener("keydown", function(event) {
+ if (event.key === "Enter" && !event.shiftKey) {
+  event.preventDefault();
+  sendMessage();
+ }
+});
 
-<div id="af-wallet">
-  <div class="wallet-card">
-    <h2>💰 Portefeuille IA Africa</h2>
-    <p>Solde de démonstration</p>
-    <select id="af-currency" onchange="afUpdateWallet()">
-      <option value="XOF">Franc CFA (FCFA)</option>
-      <option value="EUR">Euro (€)</option>
-      <option value="USD">Dollar américain ($)</option>
-    </select>
-    <h1 id="af-balance">0 FCFA</h1>
-    <p id="af-equivalent">Équivalents indicatifs : 0 € · 0 $</p>
-    <label for="af-amount">Montant</label>
-    <input id="af-amount" type="number" min="1" placeholder="Saisir un montant">
-    <button class="wallet-action" onclick="afDemoAction('Dépôt')">＋ Déposer</button>
-    <button class="wallet-action" onclick="afDemoAction('Retrait')">↗ Retirer</button>
-    <p>Version de démonstration : aucun paiement réel n'est effectué. Les dépôts et retraits réels nécessiteront un service de paiement sécurisé.</p>
-    <button class="wallet-action" onclick="document.getElementById('af-wallet').style.display='none'">Fermer</button>
-  </div>
-</div>
-
-<script>
-function afUpdateWallet() {
-  const currency = document.getElementById('af-currency').value;
-  document.getElementById('af-balance').textContent =
-    currency === 'XOF' ? '0 FCFA' : currency === 'EUR' ? '0 €' : '$0.00';
-  document.getElementById('af-equivalent').textContent =
-    'Équivalents indicatifs : 0 € · 0 $';
-}
-function afDemoAction(action) {
-  alert(action + ' : les paiements réels ne sont pas encore activés.');
-}
-</script><section id="imageStudio" style="max-width:700px;margin:24px auto;padding:20px;border-radius:16px;background:#111827;color:white;font-family:Arial,sans-serif">
-  <h2>🎨 IA Africa Core — Création d’images</h2>
-  <p>Décrivez l’image que vous souhaitez créer.</p>  <textarea id="imagePrompt" rows="4" placeholder="Exemple : une affiche éducative africaine avec des élèves dans une classe moderne..." style="width:100%;box-sizing:border-box;padding:12px;border-radius:10px"></textarea><label for="imageStyle" style="display:block;margin-top:12px">Style de l’image</label>
-<select id="imageStyle" style="width:100%;padding:12px;border-radius:8px">
-<option value="photoréaliste">Photo réaliste</option>
-<option value="illustration">Illustration</option>
-<option value="affiche publicitaire">Affiche publicitaire</option>
-<option value="dessin artistique">Dessin artistique</option>
-<option value="paysage">Paysage</option>
-<option value="portrait">Portrait</option>
-</select>
-
-<button id="generateImage" type="button" style="margin-top:14px;padding:12px 18px;border:0;border-radius:8px;background:#16a34a;color:white;font-weight:bold">Créer mon image</button>
-
-  <p id="imageStatus" role="status">Décrivez votre image pour commencer.</p>
-  <div id="imageResult"></div>
-</section><script>
-(function () {
-  const button = document.getElementById("generateImage");
-  const prompt = document.getElementById("imagePrompt");
-  const style = document.getElementById("imageStyle");
-  const status = document.getElementById("imageStatus");
-  const result = document.getElementById("imageResult");
-
-  button.addEventListener("click", function () {
-    const description = prompt.value.trim();
-
-    if (!description) {
-      status.textContent = "Décrivez d'abord l'image à créer.";
-      return;
-    }
-
-    status.textContent =
-      "Votre demande est prête. Le moteur de génération d'images doit être connecté pour produire l'image.";
-
-    result.textContent =
-      "Style choisi : " + style.value +
-      ". Description : " + description;
-  });
-})();
-</script></body>
-          </html>
+question.addEventListener("input", function() {
+ this.style.height = "48px";
+ this.style.height = Math.min(this.scrollHeight,150) + "px";
+});
+</script>
+</body>
+</html>
