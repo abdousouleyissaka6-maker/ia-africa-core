@@ -24,6 +24,7 @@ export interface Env {
   TAVILY_API_KEY?: string;
 }
 
+
 const NASA_POWER_URL =
   "https://power.larc.nasa.gov/api/temporal/daily/point";
 
