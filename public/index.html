@@ -1,4 +1,5 @@
-ki<!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -10,233 +11,416 @@ ki<!DOCTYPE html>
 *{box-sizing:border-box}
 body{
  margin:0;background:#212121;color:#ececec;
- font-family:Arial,sans-serif;min-height:100vh;
- display:flex;flex-direction:column
+ font-family:Arial,sans-serif;height:100vh;
+ display:flex;overflow:hidden
 }
-header{
- padding:16px 20px;border-bottom:1px solid #383838;
- display:flex;align-items:center;gap:12px
-header h1{font-size:18px;margin:0}
-header small{color:#aaa}
-main{
- width:100%;max-width:850px;margin:auto;
- flex:1;padding:25px 16px 130px
+button{cursor:pointer;font-family:inherit}
+.sidebar{
+ width:260px;background:#171717;padding:16px;
+ display:flex;flex-direction:column;flex-shrink:0;
+ transition:transform .25s
+}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:25px}
 .logo{
- width:52px;
- height:52px;
- min-width:52px;
- border-radius:16px;
+ width:38px;height:38px;border-radius:12px;
  background:linear-gradient(135deg,#10a37f,#075b49);
- border:2px solid white;
- box-shadow:0 0 12px rgba(16,163,127,.6);
- display:grid;
- place-items:center;
- font-size:22px;
- font-weight:900;
- color:white;
- letter-spacing:-1px;
+ display:grid;place-items:center;color:white;font-weight:bold;
+ border:1px solid #f5c542
 }
-.welcome{text-align:center;margin:65px 0 35px}
-.welcome h2{font-size:27px}
-.welcome p{color:#aaa}
-#messages{display:flex;flex-direction:column;gap:22px}
-.message{
- padding:15px 18px;border-radius:15px;
- line-height:1.65;white-space:pre-wrap;
- overflow-wrap:anywhere
+.brand-name{font-weight:bold;font-size:15px}
+.new-chat{
+ width:100%;padding:13px;background:#252525;
+ color:white;border:1px solid #444;border-radius:10px;
+ text-align:left;font-size:14px
 }
-.user{background:#303030;align-self:flex-end;max-width:85%}
-.assistant{align-self:stretch;background:#292929}
-.composer-area{
- position:fixed;bottom:0;left:0;right:0;
- background:linear-gradient(transparent,#212121 20%);
- padding:18px 14px 12px
+.new-chat:hover,.history-item:hover{background:#303030}
+.history-title{font-size:12px;color:#888;margin:25px 5px 10px}
+.history-list{overflow-y:auto;flex:1}
+.history-item{
+ padding:11px;border-radius:8px;font-size:13px;
+ color:#ddd;cursor:pointer;white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis;margin-bottom:4px
 }
+.sidebar-footer{
+ border-top:1px solid #333;padding-top:14px;
+ color:#999;font-size:12px;line-height:1.6
+}
+.app{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{
+ height:62px;border-bottom:1px solid #383838;
+ display:flex;align-items:center;padding:0 20px;gap:15px
+}
+.menu-button{
+ background:transparent;color:white;border:0;
+ font-size:23px;padding:5px
+}
+.topbar-title{font-size:16px;font-weight:bold}
+.topbar-subtitle{font-size:11px;color:#999;margin-top:3px}
+.chat-area{
+ flex:1;overflow-y:auto;padding:25px 16px 30px;
+ width:100%
+}
+.chat-inner{max-width:800px;margin:auto}
+.welcome{text-align:center;margin:12vh auto 35px}
+.welcome-logo{
+ width:65px;height:65px;border-radius:20px;
+ background:#075b49;margin:auto auto 22px;
+ display:grid;place-items:center;font-size:26px;
+ font-weight:bold;border:1px solid #f5c542
+}
+.welcome h1{font-size:27px;margin:10px}
+.welcome p{color:#aaa;font-size:14px}
+.messages{display:flex;flex-direction:column;gap:24px}
+.message-row{display:flex;gap:13px;align-items:flex-start}
+.message-avatar{
+ width:32px;height:32px;min-width:32px;
+ border-radius:50%;display:grid;place-items:center;
+ background:#075b49;font-size:12px;font-weight:bold
+}
+.message-content{
+ padding:7px 0;line-height:1.75;
+ white-space:pre-wrap;overflow-wrap:anywhere;
+ font-size:15px;flex:1
+}
+.user-row{justify-content:flex-end}
+.user-row .message-content{
+ background:#303030;border-radius:18px;
+ padding:13px 17px;flex:0 1 auto;max-width:85%
+}
+.composer-area{padding:12px 16px 10px}
+.composer-wrap{max-width:800px;margin:auto}
 .composer{
- max-width:850px;margin:auto;background:#303030;
- border:1px solid #505050;border-radius:18px;
- padding:12px;display:flex;gap:10px;align-items:flex-end
+ display:flex;align-items:flex-end;gap:9px;
+ background:#303030;border:1px solid #505050;
+ border-radius:20px;padding:10px 12px
 }
 textarea{
- flex:1;resize:none;min-height:48px;max-height:150px;
- border:0;outline:0;background:transparent;color:white;
- font-size:16px;padding:12px
+ flex:1;resize:none;min-height:42px;max-height:150px;
+ border:0;outline:0;background:transparent;
+ color:white;font-size:15px;padding:12px 5px;
+ font-family:Arial,sans-serif
 }
 select{
- background:#303030;color:#ddd;border:1px solid #555;
- border-radius:9px;padding:9px;max-width:125px
+ background:#252525;color:#ddd;border:1px solid #555;
+ border-radius:9px;padding:9px;max-width:115px;
+ font-size:12px
 }
-button{
+.send-button{
  background:#10a37f;color:white;border:0;
- border-radius:12px;padding:12px 17px;
- font-weight:bold;cursor:pointer
+ border-radius:12px;width:42px;height:42px;
+ font-size:19px;font-weight:bold
 }
-button:disabled{opacity:.5}
-.status{
- text-align:center;color:#999;font-size:12px;
- padding-top:9px
-}
-footer{
- text-align:center;color:#888;font-size:12px;
- padding:10px
-}
-@media(max-width:500px){
- .welcome{margin-top:45px}
- .composer{gap:6px;padding:8px}
- select{max-width:100px;font-size:12px}
- button{padding:12px}
+.send-button:disabled{opacity:.4}
+.status{text-align:center;color:#888;font-size:11px;padding:9px}
+.disclaimer{text-align:center;color:#777;font-size:10px;padding-bottom:5px}
+.mobile-overlay{display:none}
+
+@media(max-width:700px){
+ .sidebar{
+  position:fixed;z-index:10;left:0;top:0;bottom:0;
+  transform:translateX(-100%);width:275px
+ }
+ .sidebar.open{transform:translateX(0)}
+ .mobile-overlay{
+  position:fixed;inset:0;background:#0009;z-index:9
+ }
+ .mobile-overlay.show{display:block}
+ .topbar{height:58px;padding:0 12px}
+ .chat-area{padding:18px 13px}
+ .welcome{margin-top:10vh}
+ .welcome h1{font-size:23px}
+ .composer-area{padding:10px}
+ .composer{gap:5px;padding:7px}
+ select{max-width:95px;padding:8px 4px}
+ textarea{font-size:14px}
 }
 </style>
 </head>
 
 <body>
-<header>
- <div class="logo" aria-label="Logo IA AFRICA CORE">
- <svg viewBox="0 0 100 100" width="48" height="48" xmlns="http://www.w3.org/2000/svg">
-  <path d="M38 8 L59 13 72 27 68 42 78 54 65 72 57 94 46 78 37 65 25 51 19 34 27 17Z" fill="#ffffff" stroke="#f5c542" stroke-width="3"/>
-  <path d="M28 32 L43 25 57 38 48 53 61 65" fill="none" stroke="#10a37f" stroke-width="3"/>
-  <g fill="#f5c542">
-   <circle cx="28" cy="32" r="4"/><circle cx="43" cy="25" r="4"/>
-   <circle cx="57" cy="38" r="4"/><circle cx="48" cy="53" r="4"/>
-   <circle cx="61" cy="65" r="4"/>
-  </g>
-  <text x="43" y="48" font-size="15" font-weight="bold" fill="#075b49">IA</text>
- </svg>
+
+<div class="mobile-overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+ <div class="brand">
+  <div class="logo">IA</div>
+  <div class="brand-name">IA AFRICA CORE</div>
  </div>
- <div>
-  <h1>IA AFRICA CORE</h1>
-  <small>Votre intelligence artificielle</small>
+
+ <button class="new-chat" id="newChat">＋ Nouvelle discussion</button>
+
+ <div class="history-title">VOS CONVERSATIONS</div>
+ <div class="history-list" id="historyList"></div>
+
+ <div class="sidebar-footer">
+  IA AFRICA CORE<br>
+  Créé par Abdou Souley Issaka
  </div>
-</header>
+</aside>
 
-<main>
- <section class="welcome" id="welcome">
-  <h2>Bonjour !</h2>
-  <p>Je suis IA AFRICA CORE. Comment puis-je vous aider aujourd'hui ?</p>
- </section>
+<div class="app">
+ <header class="topbar">
+  <button class="menu-button" id="menuButton" aria-label="Menu">☰</button>
+  <div>
+   <div class="topbar-title">IA AFRICA CORE</div>
+   <div class="topbar-subtitle">Votre intelligence artificielle</div>
+  </div>
+ </header>
 
- <section id="messages"></section>
-</main>
+ <main class="chat-area" id="chatArea">
+  <div class="chat-inner">
+   <section class="welcome" id="welcome">
+    <div class="welcome-logo">IA</div>
+    <h1>Bonjour !</h1>
+    <p>Comment puis-je vous aider aujourd'hui ?</p>
+   </section>
+   <section class="messages" id="messages"></section>
+  </div>
+ </main>
 
-<div class="composer-area">
- <div class="composer">
-  <select id="language" aria-label="Langue de réponse">
-   <option value="auto">Automatique</option>
-   <option value="français">Français</option>
-   <option value="anglais">Anglais</option>
-   <option value="haoussa">Haoussa</option>
-   <option value="zarma">Zarma</option>
-  </select>
+ <div class="composer-area">
+  <div class="composer-wrap">
+   <div class="composer">
+    <select id="language" aria-label="Langue de réponse">
+     <option value="auto">Automatique</option>
+     <option value="français">Français</option>
+     <option value="anglais">Anglais</option>
+     <option value="haoussa">Haoussa</option>
+     <option value="zarma">Zarma</option>
+    </select>
 
-  <textarea id="question" placeholder="Écrivez votre message..." rows="1"></textarea>
+    <textarea id="question" rows="1"
+     placeholder="Écrivez votre message..."></textarea>
 
-  <button id="send" type="button">Envoyer</button>
+    <button class="send-button" id="send" aria-label="Envoyer">↑</button>
+   </div>
+   <div class="status" id="status">IA AFRICA CORE est prête</div>
+   <div class="disclaimer">Vérifiez les informations importantes fournies par l'intelligence artificielle.</div>
+  </div>
  </div>
- <div class="status" id="status">IA AFRICA CORE est prête</div>
 </div>
 
-<footer>IA AFRICA CORE · Créé par Abdou Souley Issaka</footer>
-
 <script>
-const question = document.getElementById("question");
-const send = document.getElementById("send");
-const messages = document.getElementById("messages");
-const welcome = document.getElementById("welcome");
-const statusText = document.getElementById("status");
-const language = document.getElementById("language");
+const question=document.getElementById("question");
+const send=document.getElementById("send");
+const messages=document.getElementById("messages");
+const welcome=document.getElementById("welcome");
+const statusText=document.getElementById("status");
+const language=document.getElementById("language");
+const historyList=document.getElementById("historyList");
+const sidebar=document.getElementById("sidebar");
+const overlay=document.getElementById("overlay");
+const chatArea=document.getElementById("chatArea");
 
-function getStableUserId() {
-  let id = localStorage.getItem("iaAfricaUserId");
-
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem("iaAfricaUserId", id);
-  }
-
-  return id;
+function getStableUserId(){
+ let id=localStorage.getItem("iaAfricaUserId");
+ if(!id){
+  id=crypto.randomUUID();
+  localStorage.setItem("iaAfricaUserId",id);
+ }
+ return id;
 }
 
-const userId = getStableUserId();
- 
-function addMessage(text, role) {
- const div = document.createElement("div");
- div.className = "message " + role;
- div.textContent = text;
- messages.appendChild(div);
- window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
- return div;
+const userId=getStableUserId();
+let conversations=[];
+let currentConversation=null;
+let sending=false;
+
+try{
+ conversations=JSON.parse(localStorage.getItem("iaAfricaConversations")||"[]");
+ if(!Array.isArray(conversations))conversations=[];
+}catch(e){conversations=[];}
+
+function saveConversations(){
+ try{
+  localStorage.setItem("iaAfricaConversations",JSON.stringify(conversations));
+ }catch(e){
+  statusText.textContent="Historique non enregistré sur cet appareil";
+ }
 }
 
-async function sendMessage() {
- const content = question.value.trim();
- if (!content || send.disabled) return;
+function createConversation(){
+ currentConversation={
+  id:crypto.randomUUID(),
+  title:"Nouvelle discussion",
+  messages:[],
+  date:Date.now()
+ };
+ conversations.unshift(currentConversation);
+ saveConversations();
+ renderHistory();
+ messages.innerHTML="";
+ welcome.style.display="block";
+ question.value="";
+ statusText.textContent="IA AFRICA CORE est prête";
+ closeSidebar();
+}
 
- welcome.style.display = "none";
- addMessage(content, "user");
- question.value = "";
- question.style.height = "48px";
- send.disabled = true;
- statusText.textContent = "IA AFRICA CORE réfléchit...";
+function renderHistory(){
+ historyList.innerHTML="";
+ conversations.forEach(conv=>{
+  const item=document.createElement("div");
+  item.className="history-item";
+  item.textContent=conv.title||"Nouvelle discussion";
+  item.title=conv.title||"Nouvelle discussion";
+  item.addEventListener("click",()=>openConversation(conv.id));
+  historyList.appendChild(item);
+ });
+}
 
- const reply = addMessage("Réponse en cours...", "assistant");
+function openConversation(id){
+ const conv=conversations.find(c=>c.id===id);
+ if(!conv)return;
+ currentConversation=conv;
+ messages.innerHTML="";
+ welcome.style.display=conv.messages.length?"none":"block";
+ conv.messages.forEach(m=>displayMessage(m.text,m.role));
+ closeSidebar();
+}
 
- try {
-  const response = await fetch("/api/chat", {
-   method: "POST",
-   headers: {"Content-Type":"application/json"},
-   body: JSON.stringify({
-    type: "text",
-    content: content,userId: userId,
-    language: language.value === "auto" ? undefined : language.value
+function displayMessage(text,role){
+ const row=document.createElement("div");
+ row.className="message-row "+(role==="user"?"user-row":"");
+
+ if(role==="assistant"){
+  const avatar=document.createElement("div");
+  avatar.className="message-avatar";
+  avatar.textContent="IA";
+  row.appendChild(avatar);
+ }
+
+ const content=document.createElement("div");
+ content.className="message-content";
+ content.textContent=text;
+ row.appendChild(content);
+ messages.appendChild(row);
+ chatArea.scrollTop=chatArea.scrollHeight;
+ return content;
+}
+
+function storeMessage(text,role){
+ if(!currentConversation){
+  currentConversation={
+   id:crypto.randomUUID(),
+   title:text.slice(0,45),
+   messages:[],
+   date:Date.now()
+  };
+  conversations.unshift(currentConversation);
+ }
+ currentConversation.messages.push({text,role});
+ if(role==="user"&&currentConversation.title==="Nouvelle discussion"){
+  currentConversation.title=text.slice(0,45);
+ }
+ saveConversations();
+ renderHistory();
+}
+
+async function sendMessage(){
+ const content=question.value.trim();
+ if(!content||sending)return;
+
+ if(!currentConversation){
+  currentConversation={
+   id:crypto.randomUUID(),
+   title:content.slice(0,45),
+   messages:[],
+   date:Date.now()
+  };
+  conversations.unshift(currentConversation);
+ }
+
+ welcome.style.display="none";
+ displayMessage(content,"user");
+ storeMessage(content,"user");
+
+ question.value="";
+ question.style.height="42px";
+ sending=true;
+ send.disabled=true;
+ statusText.textContent="IA AFRICA CORE réfléchit...";
+
+ const reply=displayMessage("Réponse en cours...","assistant");
+
+ try{
+  const response=await fetch("/api/chat",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    type:"text",
+    content:content,
+    userId:userId,
+    language:language.value==="auto"?undefined:language.value
    })
   });
 
-  const data = await response.json();
+  const data=await response.json();
 
-  if (!response.ok || data.success === false) {
-   throw new Error(data.error || "Une erreur est survenue.");
+  if(!response.ok||data.success===false){
+   throw new Error(data.error||"Une erreur est survenue.");
   }
 
-  const answer =
-   data.answer ??
-   data.response ??
-   data.text ??
-   data.content ??
-   data.output ??
+  const answer=
+   data.answer??
+   data.response??
+   data.text??
+   data.content??
+   data.output??
    data.result;
 
-  if (typeof answer === "string") {
-   reply.textContent = answer;
-  } else if (answer !== undefined) {
-   reply.textContent = JSON.stringify(answer, null, 2);
-  } else {
-   reply.textContent = JSON.stringify(data, null, 2);
+  let finalAnswer;
+  if(typeof answer==="string"){
+   finalAnswer=answer;
+  }else if(answer!==undefined){
+   finalAnswer=JSON.stringify(answer,null,2);
+  }else{
+   finalAnswer=JSON.stringify(data,null,2);
   }
 
-  statusText.textContent = "IA AFRICA CORE est prête";
- } catch (error) {
-  reply.textContent = "Impossible d'obtenir une réponse : " + error.message;
-  statusText.textContent = "Erreur de connexion";
+  reply.textContent=finalAnswer;
+  storeMessage(finalAnswer,"assistant");
+  statusText.textContent="IA AFRICA CORE est prête";
+
+ }catch(error){
+  const errorMessage="Impossible d'obtenir une réponse : "+error.message;
+  reply.textContent=errorMessage;
+  storeMessage(errorMessage,"assistant");
+  statusText.textContent="Erreur de connexion";
  }
 
- send.disabled = false;
+ sending=false;
+ send.disabled=false;
  question.focus();
- window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+ chatArea.scrollTop=chatArea.scrollHeight;
 }
 
-send.addEventListener("click", sendMessage);
+function closeSidebar(){
+ sidebar.classList.remove("open");
+ overlay.classList.remove("show");
+}
 
-question.addEventListener("keydown", function(event) {
- if (event.key === "Enter" && !event.shiftKey) {
+document.getElementById("newChat").addEventListener("click",createConversation);
+document.getElementById("menuButton").addEventListener("click",()=>{
+ sidebar.classList.toggle("open");
+ overlay.classList.toggle("show");
+});
+overlay.addEventListener("click",closeSidebar);
+send.addEventListener("click",sendMessage);
+
+question.addEventListener("keydown",event=>{
+ if(event.key==="Enter"&&!event.shiftKey){
   event.preventDefault();
   sendMessage();
  }
 });
 
-question.addEventListener("input", function() {
- this.style.height = "48px";
- this.style.height = Math.min(this.scrollHeight,150) + "px";
+question.addEventListener("input",function(){
+ this.style.height="42px";
+ this.style.height=Math.min(this.scrollHeight,150)+"px";
 });
+
+renderHistory();
 </script>
+
 </body>
 </html>
