@@ -185,20 +185,18 @@ async function getSatelliteContext(
   }
 }
 
+
 const CURRENT_INFO_PATTERN =
   /\b(actuel(?:le|s)?|aujourd'hui|aujourd’hui|maintenant|en ce moment|dernier(?:e|s)?|récent(?:e|s)?|actualités?|news|today|current|latest|recent|président|ministre|gouvernement)\b/i;
 
-}
-
 /* =========================================
    MÉMOIRE UTILISATEUR
-   Les conversations ne sont plus relues.
-   Les réponses générées par l'IA ne sont plus stockées.
 ========================================= */
 
 function getMemoryKey(userId: string): string {
+  return "user-memory-v2:" + userId;
+}
 
- 
 async function getWebSearchContext(
   message: string,
   apiKey?: string
@@ -206,7 +204,9 @@ async function getWebSearchContext(
   const key = apiKey?.trim();
 
   if (!key) {
-    console.error("TAVILY: clé API absente. Vérifier le Secret TAVILY_API_KEY dans Cloudflare.");
+    console.error(
+      "TAVILY: clé API absente. Vérifier le Secret TAVILY_API_KEY dans Cloudflare."
+    );
     return "La recherche Internet est indisponible : la clé Tavily n'est pas configurée dans Cloudflare.";
   }
 
@@ -244,7 +244,7 @@ async function getWebSearchContext(
       return `La recherche Internet a échoué. Erreur Tavily HTTP ${response.status}.`;
     }
 
-    const data = await response.json() as {
+    const data = (await response.json()) as {
       answer?: string;
       results?: Array<{
         title?: string;
@@ -263,29 +263,36 @@ async function getWebSearchContext(
       return "La recherche Internet a été effectuée, mais aucune source exploitable n'a été trouvée. Ne pas inventer de sources.";
     }
 
-    const sources = results.map((item, index) => {
-      return [
-        `${index + 1}. ${item.title}`,
-        `Date : ${item.published_date || "Date non indiquée"}`,
-        `Lien : ${item.url}`,
-        `Résumé : ${item.content}`,
-      ].join("\n");
-    }).join("\n\n");
+    const sources = results
+      .map((item, index) => {
+        return [
+          `${index + 1}. ${item.title}`,
+          `Date : ${item.published_date || "Date non indiquée"}`,
+          `Lien : ${item.url}`,
+          `Résumé : ${item.content}`,
+        ].join("\n");
+      })
+      .join("\n\n");
 
-    console.log("TAVILY: recherche réussie. Nombre de sources:", results.length);
+    console.log(
+      "TAVILY: recherche réussie. Nombre de sources:",
+      results.length
+    );
 
     return [
       "RÉSULTATS DE RECHERCHE INTERNET TAVILY :",
       data.answer ? `Réponse proposée : ${data.answer}` : "",
       sources,
       "Consigne : utilise ces sources pour répondre à la question. Cite les liens et les dates disponibles. N'invente aucune information ni aucune source.",
-    ].filter(Boolean).join("\n\n");
-
+    ]
+      .filter(Boolean)
+      .join("\n\n");
   } catch (error) {
     console.error("TAVILY ERREUR:", error);
     return "La recherche Internet n'a pas pu aboutir à cause d'une erreur technique. Ne prétends pas avoir consulté Internet.";
   }
-      }
+ }
+
 conversations ne sont plus relues.
    Les réponses générées par l'IA ne sont plus stockées.
 ========================================= */
