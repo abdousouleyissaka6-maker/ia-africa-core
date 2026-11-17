@@ -293,13 +293,7 @@ async function getWebSearchContext(
   }
  }
 
-conversations ne sont plus relues.
-   Les réponses générées par l'IA ne sont plus stockées.
-========================================= */
 
-function getMemoryKey(userId: string): string {
-  return "user-memory-v2:" + userId;
-}
 
 async function readUserMemory(
   env: Env,
